@@ -1376,27 +1376,37 @@ async def user_tasks_page(request: Request):
 async def user_task_exam_page(task_id: int, request: Request):
     if 'user_id' not in request.session:
         return _redirect("/signin.html")
-    user_id = request.session.get('user_id')
-    conn = get_db_connection()
-    task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
-    
-    # Check if already completed
-    completed = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
-    release_db_connection(conn)
-    
-    if not task or task['task_type'] != 'exam':
-        return HTMLResponse("Task not found or invalid type.", status_code=404)
+    try:
+        user_id = request.session.get('user_id')
+        conn = get_db_connection()
+        task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
         
-    if completed:
-        return _redirect("/tasks")
+        # Check if already completed
+        completed = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+        release_db_connection(conn)
         
-    import json
-    task_data = json.loads(task['task_data']) if task['task_data'] else {"questions": []}
-    
-    return _render(request, "tasks/exam.html", dict(
-        task=dict(task),
-        questions=task_data.get('questions', [])
-    ))
+        if not task:
+            return HTMLResponse("Task not found.", status_code=404)
+        
+        task_type = task.get('task_type', '') if hasattr(task, 'get') else (task['task_type'] if 'task_type' in dict(task) else '')
+        if task_type != 'exam':
+            return HTMLResponse("This task is not an exam.", status_code=404)
+            
+        if completed:
+            return _redirect("/tasks")
+            
+        import json
+        raw_data = task.get('task_data', None) if hasattr(task, 'get') else (task['task_data'] if 'task_data' in dict(task) else None)
+        task_data = json.loads(raw_data) if raw_data else {"questions": []}
+        
+        return _render(request, "tasks/exam.html", dict(
+            task=dict(task),
+            questions=task_data.get('questions', [])
+        ))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return HTMLResponse(f"Error loading exam: {str(e)}", status_code=500)
 
 
 @app.post("/api/tasks/{task_id}/exam/submit")
@@ -1474,28 +1484,38 @@ async def api_submit_exam(task_id: int, request: Request):
 async def user_task_coding_page(task_id: int, request: Request):
     if 'user_id' not in request.session:
         return _redirect("/signin.html")
-    user_id = request.session.get('user_id')
-    conn = get_db_connection()
-    task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
-    
-    # Check if already completed
-    completed = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
-    release_db_connection(conn)
-    
-    if not task or task['task_type'] != 'coding':
-        return HTMLResponse("Task not found or invalid type.", status_code=404)
+    try:
+        user_id = request.session.get('user_id')
+        conn = get_db_connection()
+        task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
         
-    if completed:
-        return _redirect("/tasks")
+        # Check if already completed
+        completed = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+        release_db_connection(conn)
         
-    import json
-    task_data = json.loads(task['task_data']) if task['task_data'] else {"instructions": "", "template": ""}
-    
-    return _render(request, "tasks/coding.html", dict(
-        task=dict(task),
-        instructions=task_data.get('instructions', ''),
-        template=task_data.get('template', '')
-    ))
+        if not task:
+            return HTMLResponse("Task not found.", status_code=404)
+        
+        task_type = task.get('task_type', '') if hasattr(task, 'get') else (task['task_type'] if 'task_type' in dict(task) else '')
+        if task_type != 'coding':
+            return HTMLResponse("This task is not a coding test.", status_code=404)
+            
+        if completed:
+            return _redirect("/tasks")
+            
+        import json
+        raw_data = task.get('task_data', None) if hasattr(task, 'get') else (task['task_data'] if 'task_data' in dict(task) else None)
+        task_data = json.loads(raw_data) if raw_data else {"instructions": "", "template": ""}
+        
+        return _render(request, "tasks/coding.html", dict(
+            task=dict(task),
+            instructions=task_data.get('instructions', ''),
+            template=task_data.get('template', '')
+        ))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return HTMLResponse(f"Error loading coding test: {str(e)}", status_code=500)
 
 
 @app.post("/api/tasks/{task_id}/coding/submit")
