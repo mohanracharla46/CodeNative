@@ -267,6 +267,46 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     '''
+
+    user_tasks_sql = '''
+        CREATE TABLE IF NOT EXISTS user_tasks (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, task_id)
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS user_tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, task_id)
+        )
+    '''
+    
+    task_submissions_sql = '''
+        CREATE TABLE IF NOT EXISTS task_submissions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+            submission_type TEXT,
+            submission_data TEXT,
+            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, task_id)
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS task_submissions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+            submission_type TEXT,
+            submission_data TEXT,
+            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, task_id)
+        )
+    '''
  
     if is_pg:
         cursor = conn.cursor()
@@ -280,6 +320,8 @@ def init_db():
         cursor.execute(career_applications_sql)
         cursor.execute(referrals_sql)
         cursor.execute(tasks_sql)
+        cursor.execute(user_tasks_sql)
+        cursor.execute(task_submissions_sql)
         
         # Create indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
@@ -308,7 +350,8 @@ def init_db():
         # Check and add missing columns to tasks table
         tasks_cols = {
             'task_type': "TEXT DEFAULT 'coding'",
-            'link': 'TEXT'
+            'link': 'TEXT',
+            'task_data': 'TEXT'
         }
         for col, col_type in tasks_cols.items():
             cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name='tasks' AND column_name='{col}'")
@@ -328,6 +371,8 @@ def init_db():
         conn.execute(career_applications_sql)
         conn.execute(referrals_sql)
         conn.execute(tasks_sql)
+        conn.execute(user_tasks_sql)
+        conn.execute(task_submissions_sql)
         
         # Create indexes
         conn.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
@@ -356,7 +401,7 @@ def init_db():
                 
         cursor = conn.execute("PRAGMA table_info(tasks)")
         existing_tasks_cols = [col[1] for col in cursor.fetchall()]
-        for col, col_type in {'task_type': "TEXT DEFAULT 'coding'", 'link': 'TEXT'}.items():
+        for col, col_type in {'task_type': "TEXT DEFAULT 'coding'", 'link': 'TEXT', 'task_data': 'TEXT'}.items():
             if col not in existing_tasks_cols:
                 conn.execute(f"ALTER TABLE tasks ADD COLUMN {col} {col_type}")
         

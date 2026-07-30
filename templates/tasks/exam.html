@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ task.title }} | Code Native</title>
+    {% include 'analytics.html' %}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+
+    <style>
+        .exam-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .question-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+        }
+        body.dark-mode .question-card {
+            background: rgba(30, 41, 59, 0.7) !important;
+            border: 1px solid #334155 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        body.dark-mode .option-label {
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        .option-label:hover {
+            background: rgba(99, 102, 241, 0.05);
+            border-color: #6366f1;
+        }
+        .option-label input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #6366f1;
+        }
+        .option-label input[type="radio"]:checked + span {
+            color: #6366f1;
+            font-weight: 600;
+        }
+        .option-label.selected {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="header-left">
+                <div class="logo">
+                    <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="/tasks" class="btn-dashboard">
+                    <i class="fas fa-arrow-left"></i> <span>Back to Tasks</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="exam-container">
+        <div class="welcome-section" style="margin-bottom: 32px; text-align: center;">
+            <span class="welcome-eyebrow" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 4px 12px; border-radius: 50px; font-weight:700; font-size:0.75rem;">
+                <i class="fas fa-file-signature"></i> EXAM ASSIGNMENT
+            </span>
+            <h1 style="margin-top: 12px;">{{ task.title }}</h1>
+            <p>{{ task.description or 'Answer all questions to complete the exam and earn points.' }}</p>
+            <div style="font-weight: 700; color: #10b981; margin-top: 8px;">Reward: +{{ task.points }} Points</div>
+        </div>
+
+        <form id="examForm" onsubmit="event.preventDefault(); submitExam();">
+            {% for q in questions %}
+            <div class="question-card">
+                <h3 style="margin: 0 0 20px 0; font-size: 1.15rem; font-weight: 700; line-height: 1.5; color: var(--text-main);">
+                    Q{{ loop.index }}: {{ q.question }}
+                </h3>
+                
+                <div class="options-container">
+                    {% for opt_key in ['A', 'B', 'C', 'D'] %}
+                    <label class="option-label" id="label-q{{ loop.parent.index0 }}-opt{{ opt_key }}">
+                        <input type="radio" name="q{{ loop.parent.index0 }}" value="{{ opt_key }}" required onclick="selectOption({{ loop.parent.index0 }}, '{{ opt_key }}')">
+                        <span>{{ q.options[opt_key] }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="question-card" style="text-align: center; color: var(--text-dim);">
+                No questions defined for this exam.
+            </div>
+            {% endfor %}
+
+            {% if questions %}
+            <button type="submit" id="submitBtn" class="btn-action btn-primary" style="width: 100%; justify-content: center; padding: 14px; border-radius: 14px; font-size: 1rem; font-weight: 700; margin-top: 10px;">
+                <i class="fas fa-paper-plane"></i> Submit Exam
+            </button>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Result Modal Overlay -->
+    <div id="resultModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.7); backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#ffffff; width:100%; max-width:480px; margin:20px; padding:40px; border-radius:24px; box-shadow:0 20px 40px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; text-align:center; position:relative; color: #1e293b;" id="resultModalCard">
+            <div style="font-size: 3.5rem; color: #10b981; margin-bottom: 20px;"><i class="fas fa-trophy"></i></div>
+            <h2 style="margin: 0 0 10px 0; font-weight: 800; font-size: 1.5rem;">Exam Completed!</h2>
+            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 24px;">Your quiz answers have been graded.</p>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 28px;">
+                <p style="margin: 0 0 8px 0; font-size: 0.9rem; color: #64748b;">Your Score</p>
+                <h3 style="margin: 0 0 4px 0; font-weight: 800; font-size: 2.2rem; color: #1e293b;" id="resultScore">0 / 0</h3>
+                <span style="font-size: 0.85rem; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: 50px;" id="resultPoints">+0 Points Earned</span>
+            </div>
+            
+            <button onclick="location.href='/tasks'" class="btn-action btn-primary" style="width: 100%; justify-content: center; padding: 12px; border-radius: 12px; font-weight: 700; text-decoration: none;">
+                Return to Tasks
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function selectOption(qIdx, optKey) {
+            // Remove selected class from all options in this question
+            document.querySelectorAll(`[id^="label-q${qIdx}-opt"]`).forEach(el => {
+                el.classList.remove('selected');
+            });
+            // Add selected class to chosen option
+            const targetLabel = document.getElementById(`label-q${qIdx}-opt${optKey}`);
+            if (targetLabel) {
+                targetLabel.classList.add('selected');
+            }
+        }
+
+        async function submitExam() {
+            const form = document.getElementById('examForm');
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Grading Exam...';
+
+            const questionsCount = {{ questions|length }};
+            const answers = {};
+            
+            for (let i = 0; i < questionsCount; i++) {
+                const selected = form.querySelector(`input[name="q${i}"]:checked`);
+                answers[i] = selected ? selected.value : '';
+            }
+
+            try {
+                const res = await fetch('/api/tasks/{{ task.id }}/exam/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ answers })
+                });
+                
+                const data = await res.json();
+                if (res.ok) {
+                    document.getElementById('resultScore').innerText = `${data.score} / ${data.total}`;
+                    document.getElementById('resultPoints').innerText = `+${data.points_earned} Points Earned`;
+                    
+                    // Dark mode modal card tweaks
+                    if (document.body.classList.contains('dark-mode')) {
+                        const card = document.getElementById('resultModalCard');
+                        card.style.background = '#1e293b';
+                        card.style.borderColor = '#334155';
+                        card.style.color = '#f8fafc';
+                        card.querySelector('div[style*="background"]').style.background = '#0f172a';
+                        card.querySelector('div[style*="background"]').style.borderColor = '#334155';
+                        card.querySelector('h3').style.color = '#f8fafc';
+                    }
+                    
+                    document.getElementById('resultModal').style.display = 'flex';
+                } else {
+                    alert(data.message || 'Failed to submit exam.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Exam';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred during submission.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Exam';
+            }
+        }
+    </script>
+</body>
+
+</html>

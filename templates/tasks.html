@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tasks | Code Native</title>
+    {% include 'analytics.html' %}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+
+    <style>
+        /* Scoped styles for the premium Task grid card layout */
+        .task-card-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .task-card-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.06);
+            border-color: #cbd5e1;
+        }
+        
+        /* Dark Mode support */
+        body.dark-mode .task-card-box {
+            background: rgba(30, 41, 59, 0.7) !important;
+            border: 1px solid #334155 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+        body.dark-mode .task-card-box:hover {
+            border-color: #475569 !important;
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.35) !important;
+        }
+        body.dark-mode .task-card-box h3 {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .task-card-box p {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .task-card-box .btn-action.btn-secondary {
+            background: rgba(51, 65, 85, 0.5);
+            border-color: #475569;
+            color: #cbd5e1;
+        }
+        body.dark-mode .task-card-box .btn-action.btn-secondary:hover {
+            background: rgba(51, 65, 85, 0.8);
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="/dashboard" class="btn-dashboard">
+                    <i class="fas fa-user-circle"></i> <span>Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-profile">
+                    <div class="profile-avatar">
+                        <img src="https://ui-avatars.com/api/?name={{ session.get('user_name', 'User') }}&background=6366f1&color=fff" alt="Avatar">
+                    </div>
+                    <div class="profile-info">
+                        <h3>{{ session.get('user_name', 'Guest') }}</h3>
+                        <span>{{ session.get('user_email', 'guest@example.com') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-group">
+                    <span class="menu-title">Main Menu</span>
+                    <a href="/dashboard" class="menu-item">
+                        <i class="fas fa-th-large"></i> Overview
+                    </a>
+                    <a href="/roadmap.html" class="menu-item">
+                        <i class="fas fa-route"></i> Roadmap
+                    </a>
+                    <a href="/compiler.html" class="menu-item">
+                        <i class="fas fa-terminal"></i> Playgrounds
+                    </a>
+                    <a href="/videos.html" class="menu-item">
+                        <i class="fas fa-play-circle"></i> Video Tutorials
+                    </a>
+                    <a href="/feedback.html" class="menu-item">
+                        <i class="fas fa-comment-dots"></i> Feedback
+                    </a>
+                    <a href="/referrals" class="menu-item">
+                        <i class="fas fa-users"></i> My Referrals
+                    </a>
+                    <a href="/tasks" class="menu-item active">
+                        <i class="fas fa-tasks"></i> Tasks
+                    </a>
+                </div>
+
+                <div class="menu-group">
+                    <span class="menu-title">My Courses</span>
+                    {% for course in user_courses %}
+                    <a href="{{ course.link }}" class="course-nav-item">
+                        <div class="course-icon {{ course.bg }}">
+                            <i class="{{ course.icon }}"></i>
+                        </div>
+                        <div class="course-details">
+                            <span class="course-name">{{ course.name }}</span>
+                            <div class="course-progress-wrapper">
+                                <div class="course-progress-bar">
+                                    <div class="course-progress-fill" style="width: {{ course.progress }}%;"></div>
+                                </div>
+                                <span class="course-progress-text">{{ course.progress }}%</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    {% if not user_courses %}
+                    <p style="padding: 10px 15px; font-size: 12px; color: var(--text-dim);">No active courses yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <div class="welcome-section" style="margin-bottom: 32px;">
+                <div class="welcome-content">
+                    <span class="welcome-eyebrow">My Learning Tasks</span>
+                    <h1>Assigned Tasks & Exams</h1>
+                    <p>Complete coding challenges and exams assigned by admin to build your score!</p>
+                </div>
+            </div>
+
+            <!-- Compute Tasks Stats in Jinja2 -->
+            {% set all_tasks_list = [] %}
+            {% for group in date_groups %}
+                {% for t in group.tasks %}
+                    {% set _ = all_tasks_list.append(t) %}
+                {% endfor %}
+            {% endfor %}
+            {% set total_count = all_tasks_list | length %}
+            {% set completed_count = all_tasks_list | selectattr('completed', 'equalto', true) | list | length %}
+            {% set pending_count = total_count - completed_count %}
+
+            <!-- Stats Overview -->
+            <div class="stats-grid" style="margin-bottom: 32px;">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <span class="stat-label">Tasks Points</span>
+                    </div>
+                    <div class="stat-value">
+                        <span class="num">{{ total_points }}</span>
+                        <span class="unit">pts</span>
+                    </div>
+                    <div class="stat-footer">
+                        <span class="trend-label">Score accumulated from assignments</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <span class="stat-label">Pending Tasks</span>
+                    </div>
+                    <div class="stat-value">
+                        <span class="num" id="pending-count-stat">{{ pending_count }}</span>
+                        <span class="unit">remaining</span>
+                    </div>
+                    <div class="stat-footer">
+                        <span class="trend-label">Incomplete assignments</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <span class="stat-label">Completed Tasks</span>
+                    </div>
+                    <div class="stat-value">
+                        <span class="num" id="completed-count-stat">{{ completed_count }}</span>
+                        <span class="unit">completed</span>
+                    </div>
+                    <div class="stat-footer">
+                        <span class="trend-label">Tasks verified & finalized</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Tasks Section -->
+            <div class="activity-section">
+                <div class="activity-header" style="margin-bottom: 32px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+                    <h2 class="section-title" style="margin-bottom: 0;"><i class="fas fa-tasks"></i> Task Assignments</h2>
+                </div>
+                
+                <div class="tasks-timeline-container" style="display: flex; flex-direction: column; gap: 40px;">
+                    {% for group in date_groups %}
+                    <div class="date-group" id="date-group-{{ loop.index }}">
+                        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-dim); margin: 0 0 20px 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="far fa-calendar-alt" style="color: #6366f1;"></i> {{ group.date }}
+                        </h3>
+                        
+                        <div class="task-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;">
+                            {% for task in group.tasks %}
+                            <div class="task-card-box" id="task-card-{{ task.id }}" style="border-radius: 20px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; height: 100%;">
+                                <!-- Glow indicator top line on complete -->
+                                {% if task.completed %}
+                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #10b981;"></div>
+                                {% endif %}
+
+                                <div>
+                                    <!-- Badges Header -->
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+                                        <div style="width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+                                            {% if task.task_type == 'exam' %}
+                                                background: rgba(245, 158, 11, 0.1); color: #f59e0b;
+                                            {% else %}
+                                                background: rgba(99, 102, 241, 0.1); color: #6366f1;
+                                            {% endif %}">
+                                            {% if task.task_type == 'exam' %}
+                                            <i class="fas fa-file-signature"></i>
+                                            {% else %}
+                                            <i class="fas fa-code"></i>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div style="display: flex; gap: 8px; align-items: center;">
+                                            <span style="font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 50px; background: rgba(16, 185, 129, 0.1); color: #10b981;">+{{ task.points }} Pts</span>
+                                            {% if task.completed %}
+                                            <span id="badge-completed-{{ task.id }}" style="font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 50px; background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;"><i class="fas fa-check"></i> Completed</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Title & Desc -->
+                                    <h3 style="margin: 0 0 10px 0; font-size: 1.15rem; font-weight: 700; color: #1e293b; line-height: 1.4;">{{ task.title }}</h3>
+                                    <p style="margin: 0 0 24px 0; font-size: 0.9rem; color: #64748b; line-height: 1.6; min-height: 48px;">{{ task.description or 'No description provided.' }}</p>
+                                </div>
+
+                                <!-- Actions -->
+                                <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: auto;">
+                                    {% if task.link %}
+                                    <a href="{{ task.link }}" target="_blank" class="btn-action btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.85rem; padding: 0.65rem 1rem; width: 100%; transition: all 0.2s;">
+                                        <i class="fas fa-external-link-alt"></i> Go to Task
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if not task.completed %}
+                                        {% if task.task_type == 'exam' %}
+                                        <a href="/tasks/{{ task.id }}/exam" class="btn-action btn-primary" style="text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.85rem; padding: 0.65rem 1rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <i class="fas fa-file-signature"></i> Start Exam
+                                        </a>
+                                        {% else %}
+                                        <a href="/tasks/{{ task.id }}/coding" class="btn-action btn-primary" style="text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.85rem; padding: 0.65rem 1rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <i class="fas fa-terminal"></i> Open Compiler
+                                        </a>
+                                        {% endif %}
+                                    {% else %}
+                                    <button disabled class="btn-action" style="background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: 600; font-size: 0.85rem; padding: 0.65rem 1rem; width: 100%; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                        <i class="fas fa-check-circle"></i> Done
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div style="background: #ffffff; border: 1px solid #f1f5f9; border-radius: 20px; padding: 48px; text-align: center; color: #64748b;">
+                        <i class="fas fa-tasks" style="font-size: 2.5rem; opacity: 0.3; margin-bottom: 12px; display: block;"></i>
+                        <h4 style="margin: 0 0 6px 0; color: var(--text-main); font-weight: 700;">No tasks assigned</h4>
+                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-dim);">Check back later for new tasks and coding exams!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile Sidebar Toggle
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('dashboardSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+
+        async function completeTask(taskId, points) {
+            const btn = document.getElementById(`btn-complete-${taskId}`);
+            if (!btn) return;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            try {
+                const res = await fetch(`/api/tasks/complete/${taskId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await res.json();
+                if (res.ok) {
+                    const card = document.getElementById(`task-card-${taskId}`);
+                    if (card) {
+                        card.style.borderColor = '#dcfce7';
+                        
+                        // Add green top line indicator dynamically if not present
+                        if (!card.querySelector('div[style*="background: #10b981"]')) {
+                            const line = document.createElement('div');
+                            line.style.position = 'absolute';
+                            line.style.top = '0';
+                            line.style.left = '0';
+                            line.style.right = '0';
+                            line.style.height = '4px';
+                            line.style.background = '#10b981';
+                            card.appendChild(line);
+                        }
+                    }
+                    
+                    const headerContainer = card.querySelector('div[style*="display: flex; gap: 8px; align-items: center"]');
+                    if (headerContainer) {
+                        const badge = document.createElement('span');
+                        badge.id = `badge-completed-${taskId}`;
+                        badge.style.fontSize = '0.72rem';
+                        badge.style.fontWeight = '700';
+                        badge.style.padding = '4px 10px';
+                        badge.style.borderRadius = '50px';
+                        badge.style.background = '#dcfce7';
+                        badge.style.color = '#15803d';
+                        badge.style.border = '1px solid #bbf7d0';
+                        badge.innerHTML = '<i class="fas fa-check"></i> Completed';
+                        headerContainer.appendChild(badge);
+                    }
+                    
+                    const actionContainer = btn.parentNode;
+                    btn.remove();
+                    
+                    const doneBtn = document.createElement('button');
+                    doneBtn.disabled = true;
+                    doneBtn.className = 'btn-action';
+                    doneBtn.style.background = '#f1f5f9';
+                    doneBtn.style.color = '#94a3b8';
+                    doneBtn.style.border = '1px solid #e2e8f0';
+                    doneBtn.style.borderRadius = '12px';
+                    doneBtn.style.fontWeight = '600';
+                    doneBtn.style.fontSize = '0.85rem';
+                    doneBtn.style.padding = '0.65rem 1rem';
+                    doneBtn.style.width = '100%';
+                    doneBtn.style.cursor = 'not-allowed';
+                    doneBtn.style.display = 'flex';
+                    doneBtn.style.alignItems = 'center';
+                    doneBtn.style.justifyContent = 'center';
+                    doneBtn.style.gap = '8px';
+                    doneBtn.innerHTML = '<i class="fas fa-check-circle"></i> Done';
+                    actionContainer.appendChild(doneBtn);
+                    
+                    // Update task stats dynamically
+                    const pendingEl = document.getElementById('pending-count-stat');
+                    const completedEl = document.getElementById('completed-count-stat');
+                    if (pendingEl && completedEl) {
+                        const pend = parseInt(pendingEl.textContent) || 0;
+                        const comp = parseInt(completedEl.textContent) || 0;
+                        pendingEl.textContent = Math.max(0, pend - 1);
+                        completedEl.textContent = comp + 1;
+                    }
+
+                    // Update total points display
+                    const pointsNumEl = document.querySelector('.stats-grid .stat-card:first-child .num');
+                    if (pointsNumEl) {
+                        const currentPoints = parseInt(pointsNumEl.textContent) || 0;
+                        pointsNumEl.textContent = currentPoints + points;
+                        
+                        pointsNumEl.style.color = '#10b981';
+                        setTimeout(() => {
+                            pointsNumEl.style.color = '';
+                        }, 1000);
+                    }
+                } else {
+                    alert(data.message || 'Failed to complete task.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Task';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Task';
+            }
+        }
+    </script>
+</body>
+
+</html>

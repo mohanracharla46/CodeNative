@@ -289,6 +289,24 @@ def init_db():
         )
     '''
 
+    user_tasks_sql = '''
+        CREATE TABLE IF NOT EXISTS user_tasks (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, task_id)
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS user_tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, task_id)
+        )
+    '''
+ 
     content_sql = '''
         CREATE TABLE IF NOT EXISTS content (
             id SERIAL PRIMARY KEY,
@@ -505,7 +523,7 @@ def init_db():
         cursor = conn.cursor()
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
-                    online_classes_sql, online_class_registrations_sql, tasks_sql]:
+                    online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql]:
             cursor.execute(sql)
 
         for idx_sql in [
@@ -538,7 +556,7 @@ def init_db():
     else:
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
-                    online_classes_sql, online_class_registrations_sql, tasks_sql]:
+                    online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql]:
             conn.execute(sql)
         for idx_sql in [
             "CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)",
@@ -1229,6 +1247,21 @@ async def dashboard(request: Request):
     else:
         execute_query(conn, "INSERT INTO user_stats (user_id, study_minutes, certificates, current_streak, max_streak) VALUES (?, 0, ?, 0, 0)", (user_id, completed_certs))
     conn.commit()
+
+    # Fetch tasks and user task completion statuses
+    all_tasks = execute_query(conn, "SELECT * FROM tasks ORDER BY created_at DESC").fetchall()
+    completed_task_ids = [row['task_id'] for row in execute_query(conn, "SELECT task_id FROM user_tasks WHERE user_id = ?", (user_id,)).fetchall()]
+    
+    tasks_data = []
+    for t in all_tasks:
+        td = dict(t)
+        td['completed'] = t['id'] in completed_task_ids
+        tasks_data.append(td)
+
+    # Calculate total points earned from completed tasks
+    total_points_res = execute_query(conn, "SELECT SUM(t.points) as points FROM user_tasks ut JOIN tasks t ON ut.task_id = t.id WHERE ut.user_id = ?", (user_id,)).fetchone()
+    total_points = total_points_res['points'] if total_points_res and total_points_res['points'] else 0
+
     release_db_connection(conn)
 
     total_practices  = sum([a['practice_count'] for a in activities])
@@ -1243,8 +1276,274 @@ async def dashboard(request: Request):
         total_practices=total_practices,
         consistency=consistency,
         activity_data=_jsonify_dates([dict(a) for a in activities]),
-        user_courses=user_courses
+        user_courses=user_courses,
+        tasks=_jsonify_dates(tasks_data),
+        total_points=total_points
     ))
+
+
+@app.get("/tasks", response_class=HTMLResponse)
+async def user_tasks_page(request: Request):
+    if 'user_id' not in request.session:
+        return _redirect("/signin.html")
+
+    user_id = request.session.get('user_id')
+    conn = get_db_connection()
+    
+    # Fetch stats
+    stats = execute_query(conn, "SELECT * FROM user_stats WHERE user_id = ?", (user_id,)).fetchone()
+    if stats:
+        stats = dict(stats)
+        stats['study_hours'] = round(stats['study_minutes'] / 60, 1)
+    else:
+        stats = {'study_hours': 0.0, 'study_minutes': 0, 'certificates': 0, 'current_streak': 0, 'max_streak': 0}
+
+    # Fetch courses for sidebar
+    courses = [
+        {'id': 'python', 'name': 'Python Core',       'icon': 'fab fa-python',    'bg': 'python-bg', 'header_bg': '#3776ab', 'link': '/python.html'},
+        {'id': 'c',      'name': 'C Architecture',    'icon': 'fas fa-code-branch','bg': 'c-bg',      'header_bg': '#00599c', 'link': '/c.html'},
+        {'id': 'java',   'name': 'Java Masterclass',  'icon': 'fab fa-java',      'bg': 'java-bg',   'header_bg': '#ed8b00', 'link': '/java.html'},
+        {'id': 'web',    'name': 'Web Development',   'icon': 'fab fa-html5',     'bg': 'web-bg',    'header_bg': '#e34f26', 'link': '/web.html'},
+        {'id': 'js',     'name': 'JavaScript Expert', 'icon': 'fab fa-js',        'bg': 'js-bg',     'header_bg': '#f7df1e', 'link': '/js.html'},
+    ]
+
+    total_topics_map     = {row['language']: row['count'] for row in execute_query(conn, "SELECT language, COUNT(*) as count FROM content GROUP BY language").fetchall()}
+    completed_topics_map = {row['language']: row['count'] for row in execute_query(conn, "SELECT language, COUNT(*) as count FROM user_progress WHERE user_id = ? GROUP BY language", (user_id,)).fetchall()}
+    
+    user_courses = []
+    for course in courses:
+        total = total_topics_map.get(course['id'], 0)
+        if total > 0:
+            done = completed_topics_map.get(course['id'], 0)
+            d = course.copy()
+            d['progress']   = int((done / total) * 100)
+            user_courses.append(d)
+
+    # Fetch tasks sorted by date descending
+    all_tasks = execute_query(conn, "SELECT * FROM tasks ORDER BY created_at DESC").fetchall()
+    completed_task_ids = [row['task_id'] for row in execute_query(conn, "SELECT task_id FROM user_tasks WHERE user_id = ?", (user_id,)).fetchall()]
+    
+    # Calculate total points
+    total_points_res = execute_query(conn, "SELECT SUM(t.points) as points FROM user_tasks ut JOIN tasks t ON ut.task_id = t.id WHERE ut.user_id = ?", (user_id,)).fetchone()
+    total_points = total_points_res['points'] if total_points_res and total_points_res['points'] else 0
+
+    release_db_connection(conn)
+
+    # Group tasks by created_at date
+    from collections import defaultdict
+    tasks_by_date = defaultdict(list)
+    
+    for t in all_tasks:
+        td = dict(t)
+        td['completed'] = t['id'] in completed_task_ids
+        created_date = str(t['created_at'])[:10] if t['created_at'] else 'No Date'
+        
+        try:
+            dt_obj = datetime.strptime(created_date, "%Y-%m-%d")
+            formatted_date = dt_obj.strftime("%d %B %Y")
+        except Exception:
+            formatted_date = created_date
+            
+        td['formatted_date'] = formatted_date
+        tasks_by_date[formatted_date].append(td)
+    
+    date_groups = []
+    seen_dates = set()
+    for t in all_tasks:
+        created_date = str(t['created_at'])[:10] if t['created_at'] else 'No Date'
+        try:
+            dt_obj = datetime.strptime(created_date, "%Y-%m-%d")
+            formatted_date = dt_obj.strftime("%d %B %Y")
+        except Exception:
+            formatted_date = created_date
+            
+        if formatted_date not in seen_dates:
+            seen_dates.add(formatted_date)
+            date_groups.append({
+                'date': formatted_date,
+                'tasks': tasks_by_date[formatted_date]
+            })
+
+    return _render(request, "tasks.html", dict(
+        stats=_jsonify_dates(stats),
+        user_courses=user_courses,
+        date_groups=date_groups,
+        total_points=total_points
+    ))
+
+
+@app.get("/tasks/{task_id}/exam", response_class=HTMLResponse)
+async def user_task_exam_page(task_id: int, request: Request):
+    if 'user_id' not in request.session:
+        return _redirect("/signin.html")
+    user_id = request.session.get('user_id')
+    conn = get_db_connection()
+    task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    
+    # Check if already completed
+    completed = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+    release_db_connection(conn)
+    
+    if not task or task['task_type'] != 'exam':
+        return HTMLResponse("Task not found or invalid type.", status_code=404)
+        
+    if completed:
+        return _redirect("/tasks")
+        
+    import json
+    task_data = json.loads(task['task_data']) if task['task_data'] else {"questions": []}
+    
+    return _render(request, "tasks/exam.html", dict(
+        task=dict(task),
+        questions=task_data.get('questions', [])
+    ))
+
+
+@app.post("/api/tasks/{task_id}/exam/submit")
+async def api_submit_exam(task_id: int, request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+    user_id = request.session.get('user_id')
+    try:
+        data = await request.json()
+        user_answers = data.get('answers', {})  # e.g. { "0": "A", "1": "C" }
+        
+        conn = get_db_connection()
+        task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+        if not task or task['task_type'] != 'exam':
+            release_db_connection(conn)
+            return JSONResponse({"message": "Task not found"}, status_code=404)
+            
+        # Verify if already completed
+        existing = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+        if existing:
+            release_db_connection(conn)
+            return JSONResponse({"message": "Task already completed"}, status_code=400)
+            
+        import json
+        task_data = json.loads(task['task_data']) if task['task_data'] else {"questions": []}
+        questions = task_data.get('questions', [])
+        
+        # Score the user answers
+        score = 0
+        total = len(questions)
+        results = []
+        
+        for idx, q in enumerate(questions):
+            ans = user_answers.get(str(idx), '').strip()
+            correct_ans = q.get('correct', '').strip()
+            is_correct = (ans.upper() == correct_ans.upper())
+            if is_correct:
+                score += 1
+            results.append({
+                "question": q.get('question'),
+                "user_answer": ans,
+                "correct_answer": correct_ans,
+                "correct": is_correct
+            })
+            
+        # Save submission
+        submission_data = json.dumps({
+            "score": score,
+            "total": total,
+            "answers": results
+        })
+        
+        execute_query(conn, "INSERT INTO task_submissions (user_id, task_id, submission_type, submission_data) VALUES (?, ?, ?, ?)",
+                      (user_id, task_id, 'exam', submission_data))
+                      
+        # Mark user task as completed
+        execute_query(conn, "INSERT INTO user_tasks (user_id, task_id) VALUES (?, ?)", (user_id, task_id))
+        
+
+        
+        conn.commit()
+        release_db_connection(conn)
+        
+        return JSONResponse({
+            "message": "Exam submitted successfully!",
+            "score": score,
+            "total": total,
+            "points_earned": task['points']
+        }, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.get("/tasks/{task_id}/coding", response_class=HTMLResponse)
+async def user_task_coding_page(task_id: int, request: Request):
+    if 'user_id' not in request.session:
+        return _redirect("/signin.html")
+    user_id = request.session.get('user_id')
+    conn = get_db_connection()
+    task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    
+    # Check if already completed
+    completed = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+    release_db_connection(conn)
+    
+    if not task or task['task_type'] != 'coding':
+        return HTMLResponse("Task not found or invalid type.", status_code=404)
+        
+    if completed:
+        return _redirect("/tasks")
+        
+    import json
+    task_data = json.loads(task['task_data']) if task['task_data'] else {"instructions": "", "template": ""}
+    
+    return _render(request, "tasks/coding.html", dict(
+        task=dict(task),
+        instructions=task_data.get('instructions', ''),
+        template=task_data.get('template', '')
+    ))
+
+
+@app.post("/api/tasks/{task_id}/coding/submit")
+async def api_submit_coding(task_id: int, request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+    user_id = request.session.get('user_id')
+    try:
+        data = await request.json()
+        code = data.get('code', '').strip()
+        
+        if not code:
+            return JSONResponse({"message": "Code content is required"}, status_code=400)
+            
+        conn = get_db_connection()
+        task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+        if not task or task['task_type'] != 'coding':
+            release_db_connection(conn)
+            return JSONResponse({"message": "Task not found"}, status_code=404)
+            
+        # Verify if already completed
+        existing = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+        if existing:
+            release_db_connection(conn)
+            return JSONResponse({"message": "Task already completed"}, status_code=400)
+            
+        import json
+        submission_data = json.dumps({
+            "code": code
+        })
+        
+        execute_query(conn, "INSERT INTO task_submissions (user_id, task_id, submission_type, submission_data) VALUES (?, ?, ?, ?)",
+                      (user_id, task_id, 'coding', submission_data))
+                      
+        # Mark user task as completed
+        execute_query(conn, "INSERT INTO user_tasks (user_id, task_id) VALUES (?, ?)", (user_id, task_id))
+        
+
+        
+        conn.commit()
+        release_db_connection(conn)
+        
+        return JSONResponse({
+            "message": "Code submitted successfully!",
+            "points_earned": task['points']
+        }, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
 
 
 @app.get("/referrals", response_class=HTMLResponse)
@@ -1955,6 +2254,13 @@ async def admin_dashboard(request: Request):
     """).fetchall()
     try:
         tasks_list = execute_query(conn2, "SELECT * FROM tasks ORDER BY created_at DESC").fetchall()
+        submissions_list = execute_query(conn2, """
+            SELECT ts.*, u.name as user_name, u.email as user_email, t.title as task_title, t.task_type
+            FROM task_submissions ts
+            JOIN users u ON ts.user_id = u.id
+            JOIN tasks t ON ts.task_id = t.id
+            ORDER BY ts.submitted_at DESC
+        """).fetchall()
         release_db_connection(conn2)
         return _render(request, "admin/dashboard.html", dict(
             contents=_jsonify_dates([dict(c) for c in contents]),
@@ -1965,7 +2271,8 @@ async def admin_dashboard(request: Request):
             career_apps=_jsonify_dates([dict(ca) for ca in career_apps]),
             online_classes=_jsonify_dates([dict(oc) for oc in online_classes_list]),
             online_registrations=_jsonify_dates([dict(r) for r in online_registrations]),
-            tasks=_jsonify_dates([dict(t) for t in tasks_list])
+            tasks=_jsonify_dates([dict(t) for t in tasks_list]),
+            submissions=_jsonify_dates([dict(s) for s in submissions_list])
         ))
     except Exception as e:
         import traceback
@@ -1984,11 +2291,19 @@ async def admin_add_task(request: Request):
         task_type = data.get('task_type', 'coding').strip()
         link = data.get('link', '').strip() or None
         
+        task_data = data.get('task_data')
+        if task_data is not None:
+            import json
+            if isinstance(task_data, (dict, list)):
+                task_data = json.dumps(task_data)
+            else:
+                task_data = str(task_data)
+        
         if not title:
             return JSONResponse({"message": "Title is required."}, status_code=400)
         conn = get_db_connection()
-        execute_query(conn, "INSERT INTO tasks (title, description, points, task_type, link) VALUES (?, ?, ?, ?, ?)", 
-                      (title, description, points, task_type, link))
+        execute_query(conn, "INSERT INTO tasks (title, description, points, task_type, link, task_data) VALUES (?, ?, ?, ?, ?, ?)", 
+                      (title, description, points, task_type, link, task_data))
         conn.commit()
         release_db_connection(conn)
         return JSONResponse({"message": "Task added successfully!"}, status_code=200)
@@ -2005,6 +2320,27 @@ async def admin_delete_task(id: int, request: Request):
         conn.commit()
         release_db_connection(conn)
         return JSONResponse({"message": "Task deleted successfully!"}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.get("/admin/submissions/{sub_id}")
+async def admin_get_submission(sub_id: int, request: Request):
+    if not _admin_check(request):
+        return JSONResponse({"message": "Unauthorized"}, status_code=403)
+    try:
+        conn = get_db_connection()
+        sub = execute_query(conn, """
+            SELECT ts.*, u.name as user_name, t.title as task_title 
+            FROM task_submissions ts
+            JOIN users u ON ts.user_id = u.id
+            JOIN tasks t ON ts.task_id = t.id
+            WHERE ts.id = ?
+        """, (sub_id,)).fetchone()
+        release_db_connection(conn)
+        if not sub:
+            return JSONResponse({"message": "Submission not found"}, status_code=404)
+        return JSONResponse(_jsonify_dates(dict(sub)))
     except Exception as e:
         return JSONResponse({"message": str(e)}, status_code=500)
 
@@ -2367,6 +2703,36 @@ Rules:
     except Exception as e:
         print(f"Chat error: {e}")
         return JSONResponse({'reply': '❌ Something went wrong. Please try again later.'}, status_code=500)
+
+
+@app.post("/api/tasks/complete/{task_id}")
+async def api_complete_task(task_id: int, request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+    
+    user_id = request.session.get('user_id')
+    conn = get_db_connection()
+    try:
+        # Check if task exists
+        task = execute_query(conn, "SELECT id FROM tasks WHERE id = ?", (task_id,)).fetchone()
+        if not task:
+            release_db_connection(conn)
+            return JSONResponse({"message": "Task not found"}, status_code=404)
+        
+        # Check if already completed
+        completed = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+        if completed:
+            release_db_connection(conn)
+            return JSONResponse({"message": "Task already completed"}, status_code=400)
+        
+        # Mark as completed
+        execute_query(conn, "INSERT INTO user_tasks (user_id, task_id) VALUES (?, ?)", (user_id, task_id))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Task marked as completed successfully."})
+    except Exception as e:
+        release_db_connection(conn)
+        return JSONResponse({"message": f"Server error: {str(e)}"}, status_code=500)
 
 
 # ─── Startup (lifespan) ───────────────────────────────────────────────────────

@@ -25,6 +25,7 @@
             <li data-tab="tab-users"><i class="fas fa-users"></i><span>Users</span></li>
             <li data-tab="tab-online-classes"><i class="fas fa-chalkboard-teacher"></i><span>Online Classes</span></li>
             <li data-tab="tab-tasks"><i class="fas fa-tasks"></i><span>Tasks</span></li>
+            <li data-tab="tab-submissions"><i class="fas fa-file-invoice"></i><span>Task Submissions</span></li>
             <li onclick="location.href='/admin/certificates'"><i class="fas fa-certificate"></i><span>Certificates</span></li>
             <li onclick="location.href='/admin/feedback'"><i class="fas fa-comments"></i><span>Feedback</span></li>
             <li onclick="location.href='/'"><i class="fas fa-home"></i><span>View Site</span></li>
@@ -729,6 +730,56 @@
                 </div>
             </div>
         </div>
+        
+        <!-- SUBMISSIONS TAB -->
+        <div id="tab-submissions" class="tab-pane">
+            <div class="section-card">
+                <div class="section-header">
+                    <div>
+                        <h2 style="margin:0;">Task Submissions</h2>
+                        <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim); margin-top: 4px;">Review user quiz results and coding submissions</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Task Title</th>
+                                <th>Type</th>
+                                <th>Submitted At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sub in submissions %}
+                            <tr>
+                                <td><strong>{{ sub.user_name }}</strong></td>
+                                <td>{{ sub.user_email }}</td>
+                                <td>{{ sub.task_title }}</td>
+                                <td>
+                                    {% if sub.task_type == 'exam' %}
+                                    <span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);"><i class="fas fa-file-signature"></i> Exam</span>
+                                    {% else %}
+                                    <span class="badge" style="background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);"><i class="fas fa-code"></i> Coding</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ sub.submitted_at }}</td>
+                                <td>
+                                    <button class="btn-action btn-primary btn-sm" onclick="viewSubmissionDetails({{ sub.id }}, '{{ sub.task_type }}')">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" style="text-align: center; padding: 2rem;">No submissions found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
         <!-- ONLINE CLASSES TAB -->
         <div id="tab-online-classes" class="tab-pane">
@@ -1103,8 +1154,53 @@
                         <label id="task_link_label">Exam Link</label>
                         <input type="url" id="task_link" class="form-control" placeholder="https://example.com/exam">
                     </div>
+                    
+                    <!-- Dynamic Exam Questions Section -->
+                    <div id="exam_questions_section" style="display: none; border: 1px dashed var(--admin-border); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                            <h4 style="margin: 0; color: var(--admin-text-main);">Exam Questions (Quiz)</h4>
+                            <button type="button" class="btn-action btn-secondary btn-sm" onclick="addQuizQuestion()"><i class="fas fa-plus"></i> Add Question</button>
+                        </div>
+                        <div id="exam_questions_list" style="display: flex; flex-direction: column; gap: 16px;">
+                            <!-- Questions will be dynamically appended here -->
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Coding Test Section -->
+                    <div id="coding_setup_section" style="display: none; border: 1px dashed var(--admin-border); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 12px 0; color: var(--admin-text-main);">Coding Test Setup</h4>
+                        <div class="form-group">
+                            <label>Coding Instructions / Prompt</label>
+                            <textarea id="coding_instructions" class="form-control" rows="3" placeholder="Write a program that takes..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Initial Starter Code Template (Optional)</label>
+                            <textarea id="coding_template" class="form-control" rows="4" style="font-family: monospace;" placeholder="def solution(n):&#10;    # Write code here&#10;    pass"></textarea>
+                        </div>
+                    </div>
                     <button type="submit" class="btn-action btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-save"></i> Save Task</button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submission Details Modal -->
+    <div class="modal" id="submissionDetailsModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Submission Details</h2>
+                <span class="close-modal" onclick="closeSubmissionModal()"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px; font-size: 0.9rem;">
+                    <p style="margin: 4px 0;"><strong>User:</strong> <span id="sub_details_user"></span></p>
+                    <p style="margin: 4px 0;"><strong>Task:</strong> <span id="sub_details_task"></span></p>
+                    <p style="margin: 4px 0;"><strong>Submitted At:</strong> <span id="sub_details_time"></span></p>
+                </div>
+                
+                <div id="sub_content_container" style="border: 1px solid var(--admin-border); border-radius: 12px; padding: 20px; background: rgba(15,23,42,0.3); max-height: 450px; overflow-y: auto;">
+                    <!-- Details will be dynamically injected here -->
+                </div>
             </div>
         </div>
     </div>
@@ -1544,22 +1640,72 @@
         setTimeout(() => m.style.display = 'none', 300);
     }
 
+    function addQuizQuestion() {
+        const container = document.getElementById('exam_questions_list');
+        const qIndex = container.children.length;
+        
+        const qCard = document.createElement('div');
+        qCard.className = 'quiz-question-builder-card';
+        qCard.style = 'border: 1px solid var(--admin-border); border-radius: 10px; padding: 14px; background: rgba(30,41,59,0.3); position: relative; margin-top: 10px;';
+        
+        qCard.innerHTML = `
+            <button type="button" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; cursor: pointer;" onclick="this.parentNode.remove()"><i class="fas fa-trash-alt"></i></button>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label style="font-size:0.8rem; font-weight:600;">Question ${qIndex + 1}</label>
+                <input type="text" class="form-control q-text" required placeholder="Question text...">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                <div class="form-group" style="margin:0;">
+                    <label style="font-size:0.75rem;">Option A</label>
+                    <input type="text" class="form-control q-opt-a" required placeholder="Option A...">
+                </div>
+                <div class="form-group" style="margin:0;">
+                    <label style="font-size:0.75rem;">Option B</label>
+                    <input type="text" class="form-control q-opt-b" required placeholder="Option B...">
+                </div>
+                <div class="form-group" style="margin:0;">
+                    <label style="font-size:0.75rem;">Option C</label>
+                    <input type="text" class="form-control q-opt-c" required placeholder="Option C...">
+                </div>
+                <div class="form-group" style="margin:0;">
+                    <label style="font-size:0.75rem;">Option D</label>
+                    <input type="text" class="form-control q-opt-d" required placeholder="Option D...">
+                </div>
+            </div>
+            <div class="form-group" style="margin:0;">
+                <label style="font-size:0.8rem; font-weight:600;">Correct Answer Option</label>
+                <select class="form-control q-correct">
+                    <option value="A">Option A</option>
+                    <option value="B">Option B</option>
+                    <option value="C">Option C</option>
+                    <option value="D">Option D</option>
+                </select>
+            </div>
+        `;
+        container.appendChild(qCard);
+    }
+
     function toggleTaskFields() {
         const type = document.getElementById('task_type').value;
         const linkGroup = document.getElementById('task_link_group');
         const linkLabel = document.getElementById('task_link_label');
         const linkInput = document.getElementById('task_link');
+        const examQuestionsSection = document.getElementById('exam_questions_section');
+        const codingSetupSection = document.getElementById('coding_setup_section');
         
         if (type === 'exam') {
-            linkGroup.style.display = 'block';
-            linkLabel.innerText = 'Exam Link (Google Form, etc.)';
-            linkInput.placeholder = 'https://forms.gle/...';
-            linkInput.required = true;
-        } else {
-            linkGroup.style.display = 'block'; // Make link option available for coding too
-            linkLabel.innerText = 'Coding Test Link (Optional)';
-            linkInput.placeholder = 'https://compiler.com/...';
+            linkGroup.style.display = 'none';
             linkInput.required = false;
+            examQuestionsSection.style.display = 'block';
+            codingSetupSection.style.display = 'none';
+            if (document.getElementById('exam_questions_list').children.length === 0) {
+                addQuizQuestion();
+            }
+        } else {
+            linkGroup.style.display = 'none';
+            linkInput.required = false;
+            examQuestionsSection.style.display = 'none';
+            codingSetupSection.style.display = 'block';
         }
     }
 
@@ -1581,12 +1727,39 @@
     }
 
     async function saveTask() {
+        const taskType = document.getElementById('task_type').value;
+        let taskData = {};
+        
+        if (taskType === 'exam') {
+            const questionCards = document.querySelectorAll('#exam_questions_list .quiz-question-builder-card');
+            const questions = [];
+            questionCards.forEach(card => {
+                questions.push({
+                    question: card.querySelector('.q-text').value,
+                    options: {
+                        A: card.querySelector('.q-opt-a').value,
+                        B: card.querySelector('.q-opt-b').value,
+                        C: card.querySelector('.q-opt-c').value,
+                        D: card.querySelector('.q-opt-d').value
+                    },
+                    correct: card.querySelector('.q-correct').value
+                });
+            });
+            taskData = { questions };
+        } else if (taskType === 'coding') {
+            taskData = {
+                instructions: document.getElementById('coding_instructions').value,
+                template: document.getElementById('coding_template').value
+            };
+        }
+
         const payload = {
             title: document.getElementById('task_title').value,
             description: document.getElementById('task_description').value,
             points: document.getElementById('task_points').value,
-            task_type: document.getElementById('task_type').value,
-            link: document.getElementById('task_link').value
+            task_type: taskType,
+            link: document.getElementById('task_link').value,
+            task_data: taskData
         };
         try {
             const res = await fetch('/admin/tasks/add', {
@@ -1734,6 +1907,72 @@
     document.getElementById('onlineClassModal').addEventListener('click', (e) => {
         if (e.target === document.getElementById('onlineClassModal')) closeClassModal();
     });
+
+    async function viewSubmissionDetails(subId, type) {
+        try {
+            const res = await fetch(`/admin/submissions/${subId}`);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+            
+            document.getElementById('sub_details_user').innerText = data.user_name;
+            document.getElementById('sub_details_task').innerText = data.task_title;
+            document.getElementById('sub_details_time').innerText = data.submitted_at;
+            
+            const container = document.getElementById('sub_content_container');
+            container.innerHTML = '';
+            
+            const subData = JSON.parse(data.submission_data || '{}');
+            
+            if (type === 'coding') {
+                const pre = document.createElement('pre');
+                pre.style.margin = '0';
+                pre.style.fontFamily = 'monospace';
+                pre.style.whiteSpace = 'pre-wrap';
+                pre.style.color = '#38bdf8';
+                pre.innerText = subData.code || 'No code submitted.';
+                container.appendChild(pre);
+            } else {
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.flexDirection = 'column';
+                div.style.gap = '12px';
+                
+                const scoreInfo = document.createElement('h3');
+                scoreInfo.style.margin = '0 0 10px 0';
+                scoreInfo.style.color = '#10b981';
+                scoreInfo.innerText = `Score: ${subData.score} / ${subData.total}`;
+                div.appendChild(scoreInfo);
+                
+                const answersList = subData.answers || [];
+                answersList.forEach((ans, idx) => {
+                    const ansRow = document.createElement('div');
+                    ansRow.style.padding = '10px';
+                    ansRow.style.borderRadius = '8px';
+                    ansRow.style.background = ans.correct ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)';
+                    ansRow.style.border = `1px solid ${ans.correct ? '#10b981' : '#ef4444'}`;
+                    ansRow.innerHTML = `
+                        <p style="margin: 0 0 4px 0; font-weight:700; color: var(--admin-text-main);">Q${idx+1}: ${ans.question}</p>
+                        <p style="margin: 2px 0; font-size: 0.85rem;">User Answer: <strong style="color:${ans.correct ? '#10b981' : '#ef4444'};">${ans.user_answer}</strong> (Correct: <strong>${ans.correct_answer}</strong>)</p>
+                    `;
+                    div.appendChild(ansRow);
+                });
+                container.appendChild(div);
+            }
+            
+            const modal = document.getElementById('submissionDetailsModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        } catch (err) {
+            console.error(err);
+            alert('Failed to load submission details.');
+        }
+    }
+
+    function closeSubmissionModal() {
+        const modal = document.getElementById('submissionDetailsModal');
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 300);
+    }
     </script>
 </body>
 </html>
