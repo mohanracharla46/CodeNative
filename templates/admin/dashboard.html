@@ -643,9 +643,9 @@
                     margin-bottom: 1.5rem;
                 }
                 .btn-filter {
-                    background: var(--admin-bg-secondary);
+                    background: var(--admin-card-bg);
                     border: 1px solid var(--admin-border);
-                    color: var(--admin-text);
+                    color: var(--admin-text-main);
                     padding: 0.5rem 1rem;
                     border-radius: 6px;
                     cursor: pointer;
@@ -680,7 +680,7 @@
                 </div>
 
                 <div class="table-container">
-                    <table class="data-table">
+                    <table class="content-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -1082,7 +1082,7 @@
                 <form id="taskForm" onsubmit="event.preventDefault(); saveTask();">
                     <div class="form-group">
                         <label>Task Type</label>
-                        <select id="task_type" class="form-control" onchange="toggleTaskFields()" style="width:100%; height:auto; padding:0.6rem; background:var(--admin-bg-secondary); color:var(--admin-text); border:1px solid var(--admin-border); border-radius:4px;">
+                        <select id="task_type" class="form-control" onchange="toggleTaskFields()">
                             <option value="coding">Coding Test</option>
                             <option value="exam">Exam</option>
                         </select>
