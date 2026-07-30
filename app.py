@@ -1923,6 +1923,7 @@ async def admin_dashboard(request: Request):
         LEFT JOIN online_classes c ON r.class_id = c.id
         ORDER BY r.registered_at DESC
     """).fetchall()
+    tasks_list = execute_query(conn2, "SELECT * FROM tasks ORDER BY created_at DESC").fetchall()
     release_db_connection(conn2)
     return _render(request, "admin/dashboard.html", dict(
         contents=_jsonify_dates([dict(c) for c in contents]),
@@ -1932,8 +1933,43 @@ async def admin_dashboard(request: Request):
         careers=_jsonify_dates([dict(c) for c in careers]),
         career_apps=_jsonify_dates([dict(ca) for ca in career_apps]),
         online_classes=_jsonify_dates([dict(oc) for oc in online_classes_list]),
-        online_registrations=_jsonify_dates([dict(r) for r in online_registrations])
+        online_registrations=_jsonify_dates([dict(r) for r in online_registrations]),
+        tasks=_jsonify_dates([dict(t) for t in tasks_list])
     ))
+
+
+@app.post("/admin/tasks/add")
+async def admin_add_task(request: Request):
+    if not _admin_check(request):
+        return JSONResponse({"message": "Unauthorized"}, status_code=403)
+    try:
+        data = await request.json()
+        title = data.get('title', '').strip()
+        description = data.get('description', '').strip()
+        points = int(data.get('points', 0))
+        if not title:
+            return JSONResponse({"message": "Title is required."}, status_code=400)
+        conn = get_db_connection()
+        execute_query(conn, "INSERT INTO tasks (title, description, points) VALUES (?, ?, ?)", (title, description, points))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Task added successfully!"}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+@app.post("/admin/tasks/delete/{id}")
+async def admin_delete_task(id: int, request: Request):
+    if not _admin_check(request):
+        return JSONResponse({"message": "Unauthorized"}, status_code=403)
+    try:
+        conn = get_db_connection()
+        execute_query(conn, "DELETE FROM tasks WHERE id = ?", (id,))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Task deleted successfully!"}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
 
 
 

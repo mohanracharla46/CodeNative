@@ -245,6 +245,24 @@ def init_db():
             verified_at TIMESTAMP
         )
     '''
+    
+    tasks_sql = '''
+        CREATE TABLE IF NOT EXISTS tasks (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT,
+            points INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT,
+            points INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
  
     if is_pg:
         cursor = conn.cursor()
@@ -257,6 +275,7 @@ def init_db():
         cursor.execute(careers_sql)
         cursor.execute(career_applications_sql)
         cursor.execute(referrals_sql)
+        cursor.execute(tasks_sql)
         
         # Create indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
@@ -294,6 +313,7 @@ def init_db():
         conn.execute(careers_sql)
         conn.execute(career_applications_sql)
         conn.execute(referrals_sql)
+        conn.execute(tasks_sql)
         
         # Create indexes
         conn.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
