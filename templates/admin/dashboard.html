@@ -636,40 +636,93 @@
 
         <!-- TASKS TAB -->
         <div id="tab-tasks" class="tab-pane">
+            <style>
+                .task-filters {
+                    display: flex;
+                    gap: 0.5rem;
+                    margin-bottom: 1.5rem;
+                }
+                .btn-filter {
+                    background: var(--admin-bg-secondary);
+                    border: 1px solid var(--admin-border);
+                    color: var(--admin-text);
+                    padding: 0.5rem 1rem;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    display: inline-flex;
+                    align-items: center;
+                    transition: all 0.2s ease;
+                }
+                .btn-filter:hover {
+                    border-color: var(--admin-primary);
+                    background: rgba(99,102,241,0.05);
+                }
+                .btn-filter.active {
+                    background: var(--admin-primary);
+                    border-color: var(--admin-primary);
+                    color: #fff;
+                }
+            </style>
             <div class="section-card">
                 <div class="section-header">
                     <div>
                         <h2 style="margin:0;">Tasks</h2>
-                        <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">Manage tasks for users</p>
+                        <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim); margin-top: 4px;">Manage tasks, exams, and coding tests for users</p>
                     </div>
                     <button class="btn-action btn-primary" onclick="openTaskModal()"><i class="fas fa-plus"></i> Add Task</button>
                 </div>
+                
+                <div class="task-filters">
+                    <button class="btn-filter active" onclick="filterTasks('all', event)">All Tasks</button>
+                    <button class="btn-filter" onclick="filterTasks('coding', event)"><i class="fas fa-code" style="margin-right: 6px;"></i> Coding Tests</button>
+                    <button class="btn-filter" onclick="filterTasks('exam', event)"><i class="fas fa-file-signature" style="margin-right: 6px;"></i> Exams</button>
+                </div>
+
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Type</th>
                                 <th>Title</th>
                                 <th>Description</th>
                                 <th>Points</th>
+                                <th>Link</th>
                                 <th>Date</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for task in tasks %}
-                            <tr>
+                            <tr class="task-row" data-type="{{ task.task_type or 'coding' }}">
                                 <td>#{{ task.id }}</td>
+                                <td>
+                                    {% if task.task_type == 'exam' %}
+                                    <span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);"><i class="fas fa-file-signature"></i> Exam</span>
+                                    {% else %}
+                                    <span class="badge" style="background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);"><i class="fas fa-code"></i> Coding</span>
+                                    {% endif %}
+                                </td>
                                 <td><strong>{{ task.title }}</strong></td>
                                 <td>{{ (task.description or '')[:50] }}{% if task.description and task.description|length > 50 %}...{% endif %}</td>
                                 <td>{{ task.points }}</td>
+                                <td>
+                                    {% if task.link %}
+                                    <a href="{{ task.link }}" target="_blank" class="btn-action btn-sm btn-edit" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);display:inline-flex;align-items:center;text-decoration:none;" title="View Link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    {% else %}
+                                    <span style="color:var(--admin-text-dim);font-size:0.8rem;">None</span>
+                                    {% endif %}
+                                </td>
                                 <td>{{ (task.created_at or '')[:10] }}</td>
                                 <td>
                                     <button class="btn-action btn-danger" onclick="deleteTask({{ task.id }})" title="Delete"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
                             {% else %}
-                            <tr><td colspan="6" style="text-align: center; padding: 2rem;">No tasks found.</td></tr>
+                            <tr><td colspan="8" style="text-align: center; padding: 2rem;">No tasks found.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -1028,6 +1081,13 @@
             <div class="modal-body">
                 <form id="taskForm" onsubmit="event.preventDefault(); saveTask();">
                     <div class="form-group">
+                        <label>Task Type</label>
+                        <select id="task_type" class="form-control" onchange="toggleTaskFields()" style="width:100%; height:auto; padding:0.6rem; background:var(--admin-bg-secondary); color:var(--admin-text); border:1px solid var(--admin-border); border-radius:4px;">
+                            <option value="coding">Coding Test</option>
+                            <option value="exam">Exam</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Title</label>
                         <input type="text" id="task_title" class="form-control" required placeholder="Task title...">
                     </div>
@@ -1038,6 +1098,10 @@
                     <div class="form-group">
                         <label>Points</label>
                         <input type="number" id="task_points" class="form-control" value="0" min="0">
+                    </div>
+                    <div class="form-group" id="task_link_group" style="display: none;">
+                        <label id="task_link_label">Exam Link</label>
+                        <input type="url" id="task_link" class="form-control" placeholder="https://example.com/exam">
                     </div>
                     <button type="submit" class="btn-action btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-save"></i> Save Task</button>
                 </form>
@@ -1468,6 +1532,7 @@
     // ── Tasks admin JS ──────────────────────────────────────────────────────
     function openTaskModal() {
         document.getElementById('taskForm').reset();
+        toggleTaskFields();
         const m = document.getElementById('taskModal');
         m.style.display = 'flex';
         setTimeout(() => m.classList.add('show'), 10);
@@ -1479,11 +1544,49 @@
         setTimeout(() => m.style.display = 'none', 300);
     }
 
+    function toggleTaskFields() {
+        const type = document.getElementById('task_type').value;
+        const linkGroup = document.getElementById('task_link_group');
+        const linkLabel = document.getElementById('task_link_label');
+        const linkInput = document.getElementById('task_link');
+        
+        if (type === 'exam') {
+            linkGroup.style.display = 'block';
+            linkLabel.innerText = 'Exam Link (Google Form, etc.)';
+            linkInput.placeholder = 'https://forms.gle/...';
+            linkInput.required = true;
+        } else {
+            linkGroup.style.display = 'block'; // Make link option available for coding too
+            linkLabel.innerText = 'Coding Test Link (Optional)';
+            linkInput.placeholder = 'https://compiler.com/...';
+            linkInput.required = false;
+        }
+    }
+
+    function filterTasks(type, event) {
+        // Remove active class from all filter buttons
+        document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+        // Add active class to clicked button
+        event.currentTarget.classList.add('active');
+        
+        // Show/hide rows
+        const rows = document.querySelectorAll('.task-row');
+        rows.forEach(row => {
+            if (type === 'all' || row.dataset.type === type) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
     async function saveTask() {
         const payload = {
             title: document.getElementById('task_title').value,
             description: document.getElementById('task_description').value,
-            points: document.getElementById('task_points').value
+            points: document.getElementById('task_points').value,
+            task_type: document.getElementById('task_type').value,
+            link: document.getElementById('task_link').value
         };
         try {
             const res = await fetch('/admin/tasks/add', {

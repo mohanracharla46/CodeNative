@@ -252,6 +252,8 @@ def init_db():
             title TEXT NOT NULL,
             description TEXT,
             points INTEGER DEFAULT 0,
+            task_type TEXT DEFAULT 'coding',
+            link TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''' if is_pg else '''
@@ -260,6 +262,8 @@ def init_db():
             title TEXT NOT NULL,
             description TEXT,
             points INTEGER DEFAULT 0,
+            task_type TEXT DEFAULT 'coding',
+            link TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     '''
@@ -301,6 +305,16 @@ def init_db():
             if not cursor.fetchone():
                 cursor.execute(f"ALTER TABLE users ADD COLUMN {col} {col_type}")
         
+        # Check and add missing columns to tasks table
+        tasks_cols = {
+            'task_type': "TEXT DEFAULT 'coding'",
+            'link': 'TEXT'
+        }
+        for col, col_type in tasks_cols.items():
+            cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name='tasks' AND column_name='{col}'")
+            if not cursor.fetchone():
+                cursor.execute(f"ALTER TABLE tasks ADD COLUMN {col} {col_type}")
+        
         conn.commit()
     else:
         # SQLite
@@ -339,6 +353,12 @@ def init_db():
         for col, col_type in cols_to_check.items():
             if col not in existing_cols:
                 conn.execute(f"ALTER TABLE users ADD COLUMN {col} {col_type}")
+                
+        cursor = conn.execute("PRAGMA table_info(tasks)")
+        existing_tasks_cols = [col[1] for col in cursor.fetchall()]
+        for col, col_type in {'task_type': "TEXT DEFAULT 'coding'", 'link': 'TEXT'}.items():
+            if col not in existing_tasks_cols:
+                conn.execute(f"ALTER TABLE tasks ADD COLUMN {col} {col_type}")
         
         conn.commit()
     

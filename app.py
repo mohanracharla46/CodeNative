@@ -273,6 +273,8 @@ def init_db():
             title TEXT NOT NULL,
             description TEXT,
             points INTEGER DEFAULT 0,
+            task_type TEXT DEFAULT 'coding',
+            link TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''' if is_pg else '''
@@ -281,6 +283,8 @@ def init_db():
             title TEXT NOT NULL,
             description TEXT,
             points INTEGER DEFAULT 0,
+            task_type TEXT DEFAULT 'coding',
+            link TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     '''
@@ -528,6 +532,8 @@ def init_db():
             _pg_add_col('content', col, t)
         for col, t in [('whatsapp','TEXT'),('college','TEXT'),('passout_year','TEXT')]:
             _pg_add_col('career_applications', col, t)
+        for col, t in [('task_type', "TEXT DEFAULT 'coding'"), ('link', 'TEXT')]:
+            _pg_add_col('tasks', col, t)
         conn.commit()
     else:
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
@@ -562,6 +568,12 @@ def init_db():
         for col in ['whatsapp','college','passout_year']:
             if col not in cols:
                 conn.execute(f"ALTER TABLE career_applications ADD COLUMN {col} TEXT")
+                
+        cur = conn.execute("PRAGMA table_info(tasks)")
+        cols = [c[1] for c in cur.fetchall()]
+        for col, t in [('task_type', "TEXT DEFAULT 'coding'"), ('link', 'TEXT')]:
+            if col not in cols:
+                conn.execute(f"ALTER TABLE tasks ADD COLUMN {col} {t}")
         conn.commit()
 
     # Sync existing referred users into the referrals table if not already present
@@ -1969,10 +1981,14 @@ async def admin_add_task(request: Request):
         title = data.get('title', '').strip()
         description = data.get('description', '').strip()
         points = int(data.get('points', 0))
+        task_type = data.get('task_type', 'coding').strip()
+        link = data.get('link', '').strip() or None
+        
         if not title:
             return JSONResponse({"message": "Title is required."}, status_code=400)
         conn = get_db_connection()
-        execute_query(conn, "INSERT INTO tasks (title, description, points) VALUES (?, ?, ?)", (title, description, points))
+        execute_query(conn, "INSERT INTO tasks (title, description, points, task_type, link) VALUES (?, ?, ?, ?, ?)", 
+                      (title, description, points, task_type, link))
         conn.commit()
         release_db_connection(conn)
         return JSONResponse({"message": "Task added successfully!"}, status_code=200)
