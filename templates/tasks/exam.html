@@ -102,15 +102,16 @@
 
         <form id="examForm" onsubmit="event.preventDefault(); submitExam();">
             {% for q in questions %}
+            {% set q_loop = loop %}
             <div class="question-card">
                 <h3 style="margin: 0 0 20px 0; font-size: 1.15rem; font-weight: 700; line-height: 1.5; color: var(--text-main);">
-                    Q{{ loop.index }}: {{ q.question }}
+                    Q{{ q_loop.index }}: {{ q.question }}
                 </h3>
                 
                 <div class="options-container">
                     {% for opt_key in ['A', 'B', 'C', 'D'] %}
-                    <label class="option-label" id="label-q{{ loop.parent.index0 }}-opt{{ opt_key }}">
-                        <input type="radio" name="q{{ loop.parent.index0 }}" value="{{ opt_key }}" required onclick="selectOption({{ loop.parent.index0 }}, '{{ opt_key }}')">
+                    <label class="option-label" id="label-q{{ q_loop.index0 }}-opt{{ opt_key }}">
+                        <input type="radio" name="q{{ q_loop.index0 }}" value="{{ opt_key }}" required onclick="selectOption({{ q_loop.index0 }}, '{{ opt_key }}')">
                         <span>{{ q.options[opt_key] }}</span>
                     </label>
                     {% endfor %}
