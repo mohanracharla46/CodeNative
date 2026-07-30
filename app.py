@@ -501,7 +501,7 @@ def init_db():
         cursor = conn.cursor()
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
-                    online_classes_sql, online_class_registrations_sql]:
+                    online_classes_sql, online_class_registrations_sql, tasks_sql]:
             cursor.execute(sql)
 
         for idx_sql in [
@@ -532,7 +532,7 @@ def init_db():
     else:
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
-                    online_classes_sql, online_class_registrations_sql]:
+                    online_classes_sql, online_class_registrations_sql, tasks_sql]:
             conn.execute(sql)
         for idx_sql in [
             "CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)",
