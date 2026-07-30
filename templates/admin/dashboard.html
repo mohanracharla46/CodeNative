@@ -661,9 +661,9 @@
                             <tr>
                                 <td>#{{ task.id }}</td>
                                 <td><strong>{{ task.title }}</strong></td>
-                                <td>{{ task.description[:50] }}...</td>
+                                <td>{{ (task.description or '')[:50] }}{% if task.description and task.description|length > 50 %}...{% endif %}</td>
                                 <td>{{ task.points }}</td>
-                                <td>{{ task.created_at[:10] }}</td>
+                                <td>{{ (task.created_at or '')[:10] }}</td>
                                 <td>
                                     <button class="btn-action btn-danger" onclick="deleteTask({{ task.id }})" title="Delete"><i class="fas fa-trash"></i></button>
                                 </td>
