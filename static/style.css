@@ -389,16 +389,38 @@ body {
 .hero-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     padding: 6px 16px;
-    background: #f1f0ff;
-    border: 1px solid #e0deff;
-    border-radius: 50px;
-    color: #5548d9;
-    font-size: 13px;
+    background: rgba(99, 102, 241, 0.06);
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    border-radius: 100px;
+    color: #4f46e5;
+    font-size: 11px;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
     margin-bottom: 24px;
     margin-left: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.03);
+}
+
+.hero-badge:hover {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08);
+}
+
+.hero-badge i {
+    font-size: 12px;
+    color: #6366f1;
+    animation: pulseIcon 2s infinite ease-in-out;
+}
+
+@keyframes pulseIcon {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.92); }
 }
 
 .hero-content h1 {
