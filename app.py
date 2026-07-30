@@ -1488,11 +1488,6 @@ async def api_submit_exam(task_id: int, request: Request):
         execute_query(conn, "INSERT INTO task_submissions (user_id, task_id, submission_type, submission_data) VALUES (?, ?, ?, ?)",
                       (user_id, task_id, 'exam', submission_data))
                       
-        # Mark user task as completed
-        execute_query(conn, "INSERT INTO user_tasks (user_id, task_id) VALUES (?, ?)", (user_id, task_id))
-        
-
-        
         conn.commit()
         release_db_connection(conn)
         
@@ -1500,7 +1495,7 @@ async def api_submit_exam(task_id: int, request: Request):
             "message": "Exam submitted successfully!",
             "score": score,
             "total": total,
-            "points_earned": task['points']
+            "points_earned": 0
         }, status_code=200)
     except Exception as e:
         return JSONResponse({"message": str(e)}, status_code=500)
@@ -1576,8 +1571,7 @@ async def api_submit_coding(task_id: int, request: Request):
         execute_query(conn, "INSERT INTO task_submissions (user_id, task_id, submission_type, submission_data) VALUES (?, ?, ?, ?)",
                       (user_id, task_id, 'coding', submission_data))
                       
-        # Mark user task as completed
-        execute_query(conn, "INSERT INTO user_tasks (user_id, task_id) VALUES (?, ?)", (user_id, task_id))
+
         
 
         
@@ -1586,7 +1580,7 @@ async def api_submit_coding(task_id: int, request: Request):
         
         return JSONResponse({
             "message": "Code submitted successfully!",
-            "points_earned": task['points']
+            "points_earned": 0
         }, status_code=200)
     except Exception as e:
         return JSONResponse({"message": str(e)}, status_code=500)
@@ -2307,6 +2301,25 @@ async def admin_dashboard(request: Request):
             JOIN tasks t ON ts.task_id = t.id
             ORDER BY ts.submitted_at DESC
         """).fetchall()
+        # Fetch approved user tasks
+        approved_tasks = execute_query(conn2, "SELECT user_id, task_id FROM user_tasks").fetchall()
+        approved_set = {(row['user_id'], row['task_id']) for row in approved_tasks}
+        
+        processed_subs = []
+        for s in submissions_list:
+            sd = dict(s)
+            sd['approved'] = (s['user_id'], s['task_id']) in approved_set
+            
+            sd['score_display'] = '—'
+            if s['task_type'] == 'exam' and s['submission_data']:
+                try:
+                    import json
+                    parsed = json.loads(s['submission_data'])
+                    sd['score_display'] = f"{parsed.get('score', 0)} / {parsed.get('total', 0)}"
+                except Exception:
+                    pass
+            processed_subs.append(sd)
+            
         release_db_connection(conn2)
         return _render(request, "admin/dashboard.html", dict(
             contents=_jsonify_dates([dict(c) for c in contents]),
@@ -2318,7 +2331,7 @@ async def admin_dashboard(request: Request):
             online_classes=_jsonify_dates([dict(oc) for oc in online_classes_list]),
             online_registrations=_jsonify_dates([dict(r) for r in online_registrations]),
             tasks=_jsonify_dates([dict(t) for t in tasks_list]),
-            submissions=_jsonify_dates([dict(s) for s in submissions_list])
+            submissions=_jsonify_dates(processed_subs)
         ))
     except Exception as e:
         import traceback
@@ -2389,6 +2402,35 @@ async def admin_get_submission(sub_id: int, request: Request):
         return JSONResponse(_jsonify_dates(dict(sub)))
     except Exception as e:
         return JSONResponse({"message": str(e)}, status_code=500)
+
+@app.post("/admin/submissions/approve/{sub_id}")
+async def admin_approve_submission(sub_id: int, request: Request):
+    if not _admin_check(request):
+        return JSONResponse({"message": "Unauthorized"}, status_code=403)
+    try:
+        conn = get_db_connection()
+        # Get submission details
+        sub = execute_query(conn, "SELECT user_id, task_id FROM task_submissions WHERE id = ?", (sub_id,)).fetchone()
+        if not sub:
+            release_db_connection(conn)
+            return JSONResponse({"message": "Submission not found"}, status_code=404)
+            
+        user_id = sub['user_id']
+        task_id = sub['task_id']
+        
+        # Check if already completed/approved
+        existing = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+        if not existing:
+            execute_query(conn, "INSERT INTO user_tasks (user_id, task_id) VALUES (?, ?)", (user_id, task_id))
+            conn.commit()
+            
+        release_db_connection(conn)
+        return JSONResponse({"message": "Submission approved and points awarded successfully!"}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+
 
 
 

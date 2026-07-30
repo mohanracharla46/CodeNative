@@ -749,8 +749,9 @@
                                 <th>Email</th>
                                 <th>Task Title</th>
                                 <th>Type</th>
+                                <th>Correct Answers / Score</th>
                                 <th>Submitted At</th>
-                                <th>Action</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -766,15 +767,31 @@
                                     <span class="badge" style="background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);"><i class="fas fa-code"></i> Coding</span>
                                     {% endif %}
                                 </td>
+                                <td>
+                                    {% if sub.task_type == 'exam' %}
+                                    <span style="font-weight:700; color:#10b981;">{{ sub.score_display }}</span>
+                                    {% else %}
+                                    <span style="color:var(--admin-text-dim);">—</span>
+                                    {% endif %}
+                                </td>
                                 <td>{{ sub.submitted_at }}</td>
                                 <td>
-                                    <button class="btn-action btn-primary btn-sm" onclick="viewSubmissionDetails({{ sub.id }}, '{{ sub.task_type }}')">
-                                        <i class="fas fa-eye"></i> View Details
-                                    </button>
+                                    <div style="display:flex; gap: 8px; align-items: center;">
+                                        <button class="btn-action btn-primary btn-sm" onclick="viewSubmissionDetails({{ sub.id }}, '{{ sub.task_type }}')" title="View Details">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                        {% if sub.approved %}
+                                        <span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);"><i class="fas fa-check-circle"></i> Approved</span>
+                                        {% else %}
+                                        <button class="btn-action btn-sm" style="background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.25);" onclick="approveSubmission({{ sub.id }})" title="Approve & Award Points">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                             {% else %}
-                            <tr><td colspan="6" style="text-align: center; padding: 2rem;">No submissions found.</td></tr>
+                            <tr><td colspan="7" style="text-align: center; padding: 2rem;">No submissions found.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -2081,6 +2098,23 @@
         const modal = document.getElementById('submissionDetailsModal');
         modal.classList.remove('show');
         setTimeout(() => modal.style.display = 'none', 300);
+    }
+
+    async function approveSubmission(subId) {
+        if (!confirm('Are you sure you want to approve this submission and award points to the user?')) return;
+        try {
+            const res = await fetch(`/admin/submissions/approve/${subId}`, { method: 'POST' });
+            const data = await res.json();
+            if (res.ok) {
+                alert('✅ ' + data.message);
+                location.reload();
+            } else {
+                alert('❌ ' + data.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Failed to approve submission.');
+        }
     }
     </script>
 </body>
