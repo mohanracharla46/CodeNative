@@ -275,6 +275,7 @@ def init_db():
             points INTEGER DEFAULT 0,
             task_type TEXT DEFAULT 'coding',
             link TEXT,
+            task_data TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''' if is_pg else '''
@@ -285,6 +286,7 @@ def init_db():
             points INTEGER DEFAULT 0,
             task_type TEXT DEFAULT 'coding',
             link TEXT,
+            task_data TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     '''
@@ -303,6 +305,28 @@ def init_db():
             user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
             task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
             completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, task_id)
+        )
+    '''
+
+    task_submissions_sql = '''
+        CREATE TABLE IF NOT EXISTS task_submissions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+            submission_type TEXT,
+            submission_data TEXT,
+            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, task_id)
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS task_submissions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+            submission_type TEXT,
+            submission_data TEXT,
+            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(user_id, task_id)
         )
     '''
@@ -523,7 +547,8 @@ def init_db():
         cursor = conn.cursor()
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
-                    online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql]:
+                    online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql,
+                    task_submissions_sql]:
             cursor.execute(sql)
 
         for idx_sql in [
@@ -550,13 +575,14 @@ def init_db():
             _pg_add_col('content', col, t)
         for col, t in [('whatsapp','TEXT'),('college','TEXT'),('passout_year','TEXT')]:
             _pg_add_col('career_applications', col, t)
-        for col, t in [('task_type', "TEXT DEFAULT 'coding'"), ('link', 'TEXT')]:
+        for col, t in [('task_type', "TEXT DEFAULT 'coding'"), ('link', 'TEXT'), ('task_data', 'TEXT')]:
             _pg_add_col('tasks', col, t)
         conn.commit()
     else:
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
-                    online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql]:
+                    online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql,
+                    task_submissions_sql]:
             conn.execute(sql)
         for idx_sql in [
             "CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)",
