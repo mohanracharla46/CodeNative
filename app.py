@@ -1941,19 +1941,23 @@ async def admin_dashboard(request: Request):
         LEFT JOIN online_classes c ON r.class_id = c.id
         ORDER BY r.registered_at DESC
     """).fetchall()
-    tasks_list = execute_query(conn2, "SELECT * FROM tasks ORDER BY created_at DESC").fetchall()
-    release_db_connection(conn2)
-    return _render(request, "admin/dashboard.html", dict(
-        contents=_jsonify_dates([dict(c) for c in contents]),
-        users_count=users_count,
-        all_users=_jsonify_dates([dict(u) for u in all_users]),
-        analytics=analytics,
-        careers=_jsonify_dates([dict(c) for c in careers]),
-        career_apps=_jsonify_dates([dict(ca) for ca in career_apps]),
-        online_classes=_jsonify_dates([dict(oc) for oc in online_classes_list]),
-        online_registrations=_jsonify_dates([dict(r) for r in online_registrations]),
-        tasks=_jsonify_dates([dict(t) for t in tasks_list])
-    ))
+    try:
+        tasks_list = execute_query(conn2, "SELECT * FROM tasks ORDER BY created_at DESC").fetchall()
+        release_db_connection(conn2)
+        return _render(request, "admin/dashboard.html", dict(
+            contents=_jsonify_dates([dict(c) for c in contents]),
+            users_count=users_count,
+            all_users=_jsonify_dates([dict(u) for u in all_users]),
+            analytics=analytics,
+            careers=_jsonify_dates([dict(c) for c in careers]),
+            career_apps=_jsonify_dates([dict(ca) for ca in career_apps]),
+            online_classes=_jsonify_dates([dict(oc) for oc in online_classes_list]),
+            online_registrations=_jsonify_dates([dict(r) for r in online_registrations]),
+            tasks=_jsonify_dates([dict(t) for t in tasks_list])
+        ))
+    except Exception as e:
+        import traceback
+        return HTMLResponse(f"<pre>Error in admin_dashboard:\n{traceback.format_exc()}</pre>", status_code=500)
 
 
 @app.post("/admin/tasks/add")
