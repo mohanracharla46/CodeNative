@@ -26,6 +26,13 @@
             <li data-tab="tab-online-classes"><i class="fas fa-chalkboard-teacher"></i><span>Online Classes</span></li>
             <li data-tab="tab-tasks"><i class="fas fa-tasks"></i><span>Tasks</span></li>
             <li data-tab="tab-submissions"><i class="fas fa-file-invoice"></i><span>Task Submissions</span></li>
+            <li data-tab="tab-doubts" style="position:relative;">
+                <i class="fas fa-question-circle"></i>
+                <span>Doubts</span>
+                {% if pending_doubts_count > 0 %}
+                <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: #ef4444; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.72rem; font-weight: 700; line-height: 1;">{{ pending_doubts_count }}</span>
+                {% endif %}
+            </li>
             <li onclick="location.href='/admin/certificates'"><i class="fas fa-certificate"></i><span>Certificates</span></li>
             <li onclick="location.href='/admin/feedback'"><i class="fas fa-comments"></i><span>Feedback</span></li>
             <li onclick="location.href='/'"><i class="fas fa-home"></i><span>View Site</span></li>
@@ -933,6 +940,74 @@
             </div>
         </div>
 
+        <!-- DOUBTS TAB -->
+        <div id="tab-doubts" class="tab-pane">
+            <div class="section-card">
+                <div class="section-header">
+                    <div>
+                        <h2 style="margin:0;">User Doubts & Support</h2>
+                        <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">Review and reply to user doubts</p>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Topic</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doubt in doubts %}
+                            <tr>
+                                <td>
+                                    <strong>{{ doubt.user_name }}</strong>
+                                    <div style="font-size:0.75rem; color:var(--admin-text-dim);">{{ doubt.user_email }}</div>
+                                </td>
+                                <td><span class="badge" style="background:rgba(99,102,241,0.15);color:#a5b4fc;">{{ doubt.language or 'General' }}</span></td>
+                                <td><strong>{{ doubt.title }}</strong></td>
+                                <td>
+                                    <div style="max-width:350px;font-size:0.82rem;white-space:pre-wrap;color:var(--admin-text-dim);">{{ doubt.description }}</div>
+                                    {% if doubt.status == 'Resolved' and doubt.admin_reply %}
+                                    <div style="margin-top: 8px; padding-left: 8px; border-left: 2px solid #10b981; font-size: 0.8rem; color: #10b981;">
+                                        <strong>Reply:</strong> {{ doubt.admin_reply }}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if doubt.status == 'Resolved' %}
+                                    <span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;">Resolved</span>
+                                    {% else %}
+                                    <span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td><span style="font-size:0.8rem;color:var(--admin-text-dim);">{{ doubt.created_at }}</span></td>
+                                <td>
+                                    {% if doubt.status == 'Pending' %}
+                                    <button class="btn-action btn-primary btn-sm" onclick="openReplyModal({{ doubt.id }}, '{{ doubt.title }}', `{{ doubt.description }}`)" title="Reply & Resolve">
+                                        <i class="fas fa-reply"></i> Reply
+                                    </button>
+                                    {% else %}
+                                    <span style="color:var(--admin-text-dim);font-size:0.8rem;"><i class="fas fa-check-circle" style="color:#10b981;"></i> Replied</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not doubts %}
+                            <tr><td colspan="7" class="empty-row"><i class="fas fa-question-circle" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No user doubts yet.</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Add/Edit Modal -->
@@ -1251,6 +1326,34 @@
         </div>
     </div>
 
+    <!-- Reply Doubt Modal -->
+    <div class="modal" id="doubtReplyModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Reply to Doubt</h2>
+                <span class="close-modal" onclick="closeReplyModal()"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="modal-body">
+                <form id="replyDoubtForm">
+                    <input type="hidden" id="reply_doubt_id">
+                    <div class="form-group">
+                        <label>Doubt Title</label>
+                        <p id="reply_doubt_title" style="font-weight:600; margin: 4px 0 12px 0; color:var(--admin-text-main);"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>User Doubt Description</label>
+                        <p id="reply_doubt_desc" style="font-size:0.85rem; color:var(--admin-text-dim); background:rgba(15,23,42,0.4); padding:10px; border-radius:6px; margin: 4px 0 16px 0; white-space:pre-wrap; max-height:120px; overflow-y:auto;"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Response / Answer</label>
+                        <textarea id="reply_doubt_text" class="form-control" style="height: 140px; resize: vertical;" placeholder="Type your reply here..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-action btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-reply"></i> Submit Reply</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     </script>
 
     <script>
@@ -1297,6 +1400,9 @@
                     else if (tabId === 'tab-tutorials') mainTitle.innerText = 'Tutorial Management';
                     else if (tabId === 'tab-careers') mainTitle.innerText = 'Careers Management';
                     else if (tabId === 'tab-online-classes') mainTitle.innerText = 'Online Classes Management';
+                    else if (tabId === 'tab-doubts') mainTitle.innerText = 'Doubts & Support Management';
+                    else if (tabId === 'tab-tasks') mainTitle.innerText = 'Task Management';
+                    else if (tabId === 'tab-submissions') mainTitle.innerText = 'Task Submissions';
                     else mainTitle.innerText = 'Users Management';
                 }
             });
@@ -1652,6 +1758,46 @@
     <script src="/static/theme.js"></script>
 
     <script>
+    // ── Doubts admin JS ──────────────────────────────────────────────────────
+    function openReplyModal(id, title, desc) {
+        document.getElementById('reply_doubt_id').value = id;
+        document.getElementById('reply_doubt_title').textContent = title;
+        document.getElementById('reply_doubt_desc').textContent = desc;
+        document.getElementById('reply_doubt_text').value = '';
+        
+        const m = document.getElementById('doubtReplyModal');
+        m.style.display = 'flex';
+        setTimeout(() => m.classList.add('show'), 10);
+    }
+
+    function closeReplyModal() {
+        const m = document.getElementById('doubtReplyModal');
+        m.classList.remove('show');
+        setTimeout(() => m.style.display = 'none', 300);
+    }
+
+    document.getElementById('replyDoubtForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('reply_doubt_id').value;
+        const reply = document.getElementById('reply_doubt_text').value;
+        try {
+            const res = await fetch(`/admin/doubts/reply/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reply })
+            });
+            if (res.ok) {
+                alert('✅ Reply submitted successfully!');
+                location.reload();
+            } else {
+                const err = await res.json();
+                alert('Error: ' + err.message);
+            }
+        } catch (err) {
+            alert('An error occurred.');
+        }
+    };
+
     // ── Online Classes admin JS ─────────────────────────────────────────────
     const onlineClassesData = {{ online_classes | tojson | safe }};
 

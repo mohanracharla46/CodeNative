@@ -543,12 +543,56 @@ def init_db():
         )
     '''
 
+    doubts_sql = '''
+        CREATE TABLE IF NOT EXISTS doubts (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            language TEXT,
+            status TEXT DEFAULT 'Pending',
+            admin_reply TEXT,
+            replied_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS doubts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            language TEXT,
+            status TEXT DEFAULT 'Pending',
+            admin_reply TEXT,
+            replied_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
+    user_notifications_sql = '''
+        CREATE TABLE IF NOT EXISTS user_notifications (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            message TEXT NOT NULL,
+            is_read INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS user_notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            message TEXT NOT NULL,
+            is_read INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
                     online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql,
-                    task_submissions_sql]:
+                    task_submissions_sql, doubts_sql, user_notifications_sql]:
             cursor.execute(sql)
 
         for idx_sql in [
@@ -582,7 +626,7 @@ def init_db():
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
                     online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql,
-                    task_submissions_sql]:
+                    task_submissions_sql, doubts_sql, user_notifications_sql]:
             conn.execute(sql)
         for idx_sql in [
             "CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)",
@@ -2305,6 +2349,17 @@ async def admin_dashboard(request: Request):
         approved_tasks = execute_query(conn2, "SELECT user_id, task_id FROM user_tasks").fetchall()
         approved_set = {(row['user_id'], row['task_id']) for row in approved_tasks}
         
+        # Fetch doubts list
+        doubts_list = execute_query(conn2, """
+            SELECT d.*, u.name as user_name, u.email as user_email 
+            FROM doubts d 
+            JOIN users u ON d.user_id = u.id 
+            ORDER BY d.created_at DESC
+        """).fetchall()
+        
+        pending_doubts_count_res = execute_query(conn2, "SELECT COUNT(*) as count FROM doubts WHERE status = 'Pending'").fetchone()
+        pending_doubts_count = pending_doubts_count_res['count'] if pending_doubts_count_res else 0
+        
         processed_subs = []
         for s in submissions_list:
             sd = dict(s)
@@ -2331,7 +2386,9 @@ async def admin_dashboard(request: Request):
             online_classes=_jsonify_dates([dict(oc) for oc in online_classes_list]),
             online_registrations=_jsonify_dates([dict(r) for r in online_registrations]),
             tasks=_jsonify_dates([dict(t) for t in tasks_list]),
-            submissions=_jsonify_dates(processed_subs)
+            submissions=_jsonify_dates(processed_subs),
+            doubts=_jsonify_dates([dict(d) for d in doubts_list]),
+            pending_doubts_count=pending_doubts_count
         ))
     except Exception as e:
         import traceback
@@ -2422,6 +2479,13 @@ async def admin_approve_submission(sub_id: int, request: Request):
         existing = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
         if not existing:
             execute_query(conn, "INSERT INTO user_tasks (user_id, task_id) VALUES (?, ?)", (user_id, task_id))
+            
+            task_info = execute_query(conn, "SELECT title, points FROM tasks WHERE id = ?", (task_id,)).fetchone()
+            title = task_info['title'] if task_info else "Task"
+            pts = task_info['points'] if task_info else 0
+            msg = f"🎉 Your submission for '{title}' was approved! You earned {pts} points."
+            execute_query(conn, "INSERT INTO user_notifications (user_id, message) VALUES (?, ?)", (user_id, msg))
+            
             conn.commit()
             
         release_db_connection(conn)
@@ -2821,6 +2885,137 @@ async def api_complete_task(task_id: int, request: Request):
     except Exception as e:
         release_db_connection(conn)
         return JSONResponse({"message": f"Server error: {str(e)}"}, status_code=500)
+
+
+# ─── Doubts & Support Routes ──────────────────────────────────────────────────
+@app.get("/doubts", response_class=HTMLResponse)
+async def doubts_page(request: Request):
+    if 'user_id' not in request.session:
+        return _redirect("/signin.html")
+    user_id = request.session.get('user_id')
+    conn = get_db_connection()
+    user_doubts = execute_query(conn, "SELECT * FROM doubts WHERE user_id = ? ORDER BY created_at DESC", (user_id,)).fetchall()
+    
+    total_points_res = execute_query(conn, "SELECT SUM(t.points) as points FROM user_tasks ut JOIN tasks t ON ut.task_id = t.id WHERE ut.user_id = ?", (user_id,)).fetchone()
+    total_points = total_points_res['points'] if total_points_res and total_points_res['points'] else 0
+    
+    courses = [
+        {'id': 'python', 'name': 'Python Core',       'icon': 'fab fa-python',    'bg': 'python-bg', 'header_bg': '#3776ab', 'link': '/python.html'},
+        {'id': 'c',      'name': 'C Architecture',    'icon': 'fas fa-code-branch','bg': 'c-bg',      'header_bg': '#00599c', 'link': '/c.html'},
+        {'id': 'java',   'name': 'Java Masterclass',  'icon': 'fab fa-java',      'bg': 'java-bg',   'header_bg': '#ed8b00', 'link': '/java.html'},
+        {'id': 'web',    'name': 'Web Development',   'icon': 'fab fa-html5',     'bg': 'web-bg',    'header_bg': '#e34f26', 'link': '/web.html'},
+        {'id': 'js',     'name': 'JavaScript Expert', 'icon': 'fab fa-js',        'bg': 'js-bg',     'header_bg': '#f7df1e', 'link': '/js.html'},
+    ]
+    total_topics_map     = {row['language']: row['count'] for row in execute_query(conn, "SELECT language, COUNT(*) as count FROM content GROUP BY language").fetchall()}
+    completed_topics_map = {row['language']: row['count'] for row in execute_query(conn, "SELECT language, COUNT(*) as count FROM user_progress WHERE user_id = ? GROUP BY language", (user_id,)).fetchall()}
+    user_courses = []
+    for course in courses:
+        total = total_topics_map.get(course['id'], 0)
+        if total > 0:
+            done = completed_topics_map.get(course['id'], 0)
+            d = course.copy()
+            d['progress']   = int((done / total) * 100)
+            user_courses.append(d)
+            
+    release_db_connection(conn)
+    return _render(request, "doubts.html", dict(
+        doubts=_jsonify_dates([dict(d) for d in user_doubts]),
+        total_points=total_points,
+        user_courses=user_courses
+    ))
+
+@app.post("/api/doubts/raise")
+async def raise_doubt(request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+    try:
+        user_id = request.session.get('user_id')
+        data = await request.json()
+        title = data.get('title', '').strip()
+        description = data.get('description', '').strip()
+        language = data.get('language', '').strip()
+        
+        if not title or not description:
+            return JSONResponse({"message": "Title and description are required."}, status_code=400)
+            
+        conn = get_db_connection()
+        execute_query(conn, """
+            INSERT INTO doubts (user_id, title, description, language, status)
+            VALUES (?, ?, ?, ?, 'Pending')
+        """, (user_id, title, description, language))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Doubt raised successfully!"}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+@app.post("/admin/doubts/reply/{id}")
+async def reply_doubt(id: int, request: Request):
+    if not _admin_check(request):
+        return JSONResponse({"message": "Unauthorized"}, status_code=403)
+    try:
+        data = await request.json()
+        reply_text = data.get('reply', '').strip()
+        if not reply_text:
+            return JSONResponse({"message": "Reply cannot be empty."}, status_code=400)
+            
+        conn = get_db_connection()
+        doubt = execute_query(conn, "SELECT user_id, title FROM doubts WHERE id = ?", (id,)).fetchone()
+        if not doubt:
+            release_db_connection(conn)
+            return JSONResponse({"message": "Doubt not found."}, status_code=404)
+            
+        user_id = doubt['user_id']
+        title = doubt['title']
+        
+        now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        execute_query(conn, """
+            UPDATE doubts
+            SET status = 'Resolved', admin_reply = ?, replied_at = ?
+            WHERE id = ?
+        """, (reply_text, now_str, id))
+        
+        msg = f"💬 Admin replied to your doubt: '{title}'"
+        execute_query(conn, "INSERT INTO user_notifications (user_id, message) VALUES (?, ?)", (user_id, msg))
+        
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Reply saved and notification sent!"}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+# ─── Notifications Routes ─────────────────────────────────────────────────────
+@app.get("/api/notifications")
+async def get_notifications(request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+    try:
+        user_id = request.session.get('user_id')
+        conn = get_db_connection()
+        notifications = execute_query(conn, """
+            SELECT * FROM user_notifications 
+            WHERE user_id = ? 
+            ORDER BY created_at DESC 
+            LIMIT 50
+        """, (user_id,)).fetchall()
+        release_db_connection(conn)
+        return JSONResponse(_jsonify_dates([dict(n) for n in notifications]))
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+@app.post("/api/notifications/read-all")
+async def notifications_read_all(request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+    try:
+        user_id = request.session.get('user_id')
+        conn = get_db_connection()
+        execute_query(conn, "UPDATE user_notifications SET is_read = 1 WHERE user_id = ?", (user_id,))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "All notifications marked as read."})
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
 
 
 # ─── Startup (lifespan) ───────────────────────────────────────────────────────

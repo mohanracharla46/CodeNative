@@ -307,7 +307,51 @@ def init_db():
             UNIQUE(user_id, task_id)
         )
     '''
- 
+
+    doubts_sql = '''
+        CREATE TABLE IF NOT EXISTS doubts (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            language TEXT,
+            status TEXT DEFAULT 'Pending',
+            admin_reply TEXT,
+            replied_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS doubts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            language TEXT,
+            status TEXT DEFAULT 'Pending',
+            admin_reply TEXT,
+            replied_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
+    user_notifications_sql = '''
+        CREATE TABLE IF NOT EXISTS user_notifications (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            message TEXT NOT NULL,
+            is_read INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS user_notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            message TEXT NOT NULL,
+            is_read INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
@@ -322,6 +366,8 @@ def init_db():
         cursor.execute(tasks_sql)
         cursor.execute(user_tasks_sql)
         cursor.execute(task_submissions_sql)
+        cursor.execute(doubts_sql)
+        cursor.execute(user_notifications_sql)
         
         # Create indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
@@ -373,6 +419,8 @@ def init_db():
         conn.execute(tasks_sql)
         conn.execute(user_tasks_sql)
         conn.execute(task_submissions_sql)
+        conn.execute(doubts_sql)
+        conn.execute(user_notifications_sql)
         
         # Create indexes
         conn.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")

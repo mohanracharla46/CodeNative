@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support & Doubts | Code Native</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+    <style>
+        /* Notifications Icon & Badge */
+        .notifications-dropdown-container {
+            position: relative;
+            margin-right: 15px;
+            display: inline-block;
+        }
+        .btn-notifications {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .btn-notifications:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .notification-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+        
+        /* Notifications Dropdown Card */
+        .notifications-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 320px;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideDown 0.2s ease-out forwards;
+        }
+        .notifications-dropdown.show {
+            display: flex;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(30, 41, 59, 0.8);
+        }
+        .notifications-header h3 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+        .btn-text {
+            background: none;
+            border: none;
+            color: #6366f1;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s;
+        }
+        .btn-text:hover {
+            color: #818cf8;
+            text-decoration: underline;
+        }
+        
+        /* Notifications List */
+        .notifications-list {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .notification-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            line-height: 1.4;
+            transition: background 0.2s;
+        }
+        .notification-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .notification-item.unread {
+            background: rgba(99, 102, 241, 0.08);
+            color: #f1f5f9;
+        }
+        .notification-item.unread:hover {
+            background: rgba(99, 102, 241, 0.12);
+        }
+        .notification-empty {
+            padding: 24px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+        .notification-time {
+            display: block;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Doubts Layout styles */
+        .doubts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+        @media(min-width: 992px) {
+            .doubts-grid {
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+        .card-doubt {
+            background: var(--bg-card, #1e293b);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .card-doubt h2 {
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.88rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.92rem;
+            transition: all 0.2s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        .btn-submit-doubt {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background: #6366f1;
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-submit-doubt:hover {
+            background: #4f46e5;
+        }
+
+        /* Doubts List */
+        .doubt-list-item {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+        .doubt-list-item:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .doubt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .doubt-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #f8fafc;
+            margin: 0;
+        }
+        .doubt-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+        .badge-resolved {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+        .doubt-meta {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 12px;
+        }
+        .doubt-desc {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+            white-space: pre-wrap;
+        }
+        .admin-reply-box {
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 3px solid #6366f1;
+            padding: 14px 18px;
+            border-radius: 4px 8px 8px 4px;
+            margin-top: 12px;
+        }
+        .admin-reply-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #818cf8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .admin-reply-content {
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
+                </div>
+            </div>
+            <div class="header-actions" style="display: flex; align-items: center;">
+                <!-- Notifications Dropdown -->
+                <div class="notifications-dropdown-container">
+                    <button class="btn-notifications" id="notificationsBtn" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </button>
+                    <div class="notifications-dropdown" id="notificationsDropdown">
+                        <div class="notifications-header">
+                            <h3>Notifications</h3>
+                            <button id="markAllReadBtn" class="btn-text">Mark all read</button>
+                        </div>
+                        <div class="notifications-list" id="notificationsList">
+                            <div class="notification-empty">No new notifications</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="/dashboard" class="btn-dashboard">
+                    <i class="fas fa-user-circle"></i> <span>Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-profile">
+                    <div class="profile-avatar">
+                        <img src="https://ui-avatars.com/api/?name={{ session.get('user_name', 'User') }}&background=6366f1&color=fff" alt="Avatar">
+                    </div>
+                    <div class="profile-info">
+                        <h3>{{ session.get('user_name', 'Guest') }}</h3>
+                        <span>{{ session.get('user_email', 'guest@example.com') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-group">
+                    <span class="menu-title">Main Menu</span>
+                    <a href="/dashboard" class="menu-item">
+                        <i class="fas fa-th-large"></i> Overview
+                    </a>
+                    <a href="/roadmap.html" class="menu-item">
+                        <i class="fas fa-route"></i> Roadmap
+                    </a>
+                    <a href="/compiler.html" class="menu-item">
+                        <i class="fas fa-terminal"></i> Playgrounds
+                    </a>
+                    <a href="/videos.html" class="menu-item">
+                        <i class="fas fa-play-circle"></i> Video Tutorials
+                    </a>
+                    <a href="/feedback.html" class="menu-item">
+                        <i class="fas fa-comment-dots"></i> Feedback
+                    </a>
+                    <a href="/referrals" class="menu-item">
+                        <i class="fas fa-users"></i> My Referrals
+                    </a>
+                    <a href="/tasks" class="menu-item">
+                        <i class="fas fa-tasks"></i> Tasks
+                    </a>
+                    <a href="/doubts" class="menu-item active">
+                        <i class="fas fa-question-circle"></i> Support / Doubts
+                    </a>
+                </div>
+
+                <div class="menu-group">
+                    <span class="menu-title">My Courses</span>
+                    {% for course in user_courses %}
+                    <a href="{{ course.link }}" class="course-nav-item">
+                        <div class="course-icon {{ course.bg }}">
+                            <i class="{{ course.icon }}"></i>
+                        </div>
+                        <div class="course-details">
+                            <span class="course-name">{{ course.name }}</span>
+                            <div class="course-progress-wrapper">
+                                <div class="course-progress-bar">
+                                    <div class="course-progress-fill" style="width: {{ course.progress }}%;"></div>
+                                </div>
+                                <span class="course-progress-text">{{ course.progress }}%</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <div class="welcome-section" style="margin-bottom: 24px;">
+                <h1>Support & Doubts</h1>
+                <p>Have any doubts or queries? Raise them here, and our experts will clear them for you!</p>
+            </div>
+
+            <div class="doubts-grid">
+                <!-- Raise Doubt Form -->
+                <div class="card-doubt">
+                    <h2>Raise a New Doubt</h2>
+                    <form id="raiseDoubtForm">
+                        <div class="form-group">
+                            <label for="doubtLanguage">Topic / Course</label>
+                            <select id="doubtLanguage" class="form-control">
+                                <option value="Python">Python Core</option>
+                                <option value="C">C Architecture</option>
+                                <option value="Java">Java Masterclass</option>
+                                <option value="WebDev">Web Development</option>
+                                <option value="JavaScript">JavaScript Expert</option>
+                                <option value="Other">General / Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="doubtTitle">Doubt Title</label>
+                            <input type="text" id="doubtTitle" class="form-control" placeholder="e.g. For loop syntax error" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="doubtDescription">Explain your doubt in detail</label>
+                            <textarea id="doubtDescription" class="form-control" style="height: 150px; resize: vertical;" placeholder="Include any error message, code snippet, or description of the issue..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit-doubt">Submit Doubt</button>
+                    </form>
+                </div>
+
+                <!-- Doubt History -->
+                <div class="card-doubt">
+                    <h2>Your Doubts History</h2>
+                    <div id="doubtsListContainer">
+                        {% for doubt in doubts %}
+                        <div class="doubt-list-item">
+                            <div class="doubt-header">
+                                <h3 class="doubt-title">{{ doubt.title }}</h3>
+                                <span class="doubt-badge {% if doubt.status == 'Resolved' %}badge-resolved{% else %}badge-pending{% endif %}">
+                                    {{ doubt.status }}
+                                </span>
+                            </div>
+                            <div class="doubt-meta">
+                                <span><i class="fas fa-code"></i> {{ doubt.language }}</span>
+                                <span><i class="fas fa-calendar-alt"></i> {{ doubt.created_at }}</span>
+                            </div>
+                            <div class="doubt-desc">{{ doubt.description }}</div>
+                            
+                            {% if doubt.status == 'Resolved' and doubt.admin_reply %}
+                            <div class="admin-reply-box">
+                                <div class="admin-reply-title">Expert Response</div>
+                                <div class="admin-reply-content">{{ doubt.admin_reply }}</div>
+                                <span style="font-size:0.75rem; color:#64748b; margin-top:8px; display:block;">
+                                    Replied at: {{ doubt.replied_at }}
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        
+                        {% if not doubts %}
+                        <div style="text-align: center; padding: 40px; color: #64748b;">
+                            <i class="fas fa-question-circle" style="font-size: 3rem; margin-bottom: 12px; opacity: 0.3;"></i>
+                            <p>You haven't raised any doubts yet.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Form Submission Logic
+        const form = document.getElementById('raiseDoubtForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const data = {
+                title: document.getElementById('doubtTitle').value,
+                description: document.getElementById('doubtDescription').value,
+                language: document.getElementById('doubtLanguage').value
+            };
+            try {
+                const res = await fetch('/api/doubts/raise', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    alert('✅ Doubt raised successfully! We will review it shortly.');
+                    location.reload();
+                } else {
+                    const err = await res.json();
+                    alert('Error: ' + err.message);
+                }
+            } catch (err) {
+                alert('An error occurred. Please try again.');
+            }
+        };
+
+        // Mobile Sidebar Toggle
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('dashboardSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+
+        // Notifications Logic
+        const notificationsBtn = document.getElementById('notificationsBtn');
+        const notificationsDropdown = document.getElementById('notificationsDropdown');
+        const notificationsList = document.getElementById('notificationsList');
+        const notificationBadge = document.getElementById('notificationBadge');
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+
+        async function fetchNotifications() {
+            try {
+                const res = await fetch('/api/notifications');
+                if (res.ok) {
+                    const data = await res.json();
+                    renderNotifications(data);
+                }
+            } catch (err) {
+                console.error('Error fetching notifications:', err);
+            }
+        }
+
+        function renderNotifications(items) {
+            notificationsList.innerHTML = '';
+            let unreadCount = 0;
+
+            if (items.length === 0) {
+                notificationsList.innerHTML = '<div class="notification-empty">No new notifications</div>';
+                notificationBadge.style.display = 'none';
+                return;
+            }
+
+            items.forEach(item => {
+                const isUnread = item.is_read === 0;
+                if (isUnread) unreadCount++;
+
+                const div = document.createElement('div');
+                div.className = `notification-item ${isUnread ? 'unread' : ''}`;
+                
+                let dateStr = '';
+                if (item.created_at) {
+                    const d = new Date(item.created_at);
+                    dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
+
+                div.innerHTML = `
+                    <div>${item.message}</div>
+                    <span class="notification-time">${dateStr}</span>
+                `;
+                notificationsList.appendChild(div);
+            });
+
+            if (unreadCount > 0) {
+                notificationBadge.textContent = unreadCount;
+                notificationBadge.style.display = 'block';
+            } else {
+                notificationBadge.style.display = 'none';
+            }
+        }
+
+        if (notificationsBtn) {
+            notificationsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notificationsDropdown.classList.toggle('show');
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (notificationsDropdown && !notificationsDropdown.contains(e.target) && e.target !== notificationsBtn) {
+                notificationsDropdown.classList.remove('show');
+            }
+        });
+
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', async () => {
+                try {
+                    const res = await fetch('/api/notifications/read-all', { method: 'POST' });
+                    if (res.ok) {
+                        fetchNotifications();
+                    }
+                } catch (err) {
+                    console.error('Error marking all as read:', err);
+                }
+            });
+        }
+
+        fetchNotifications();
+        setInterval(fetchNotifications, 30000);
+    </script>
+</body>
+
+</html>
