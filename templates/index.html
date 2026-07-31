@@ -861,7 +861,7 @@
     </style>
 
     <!-- WhatsApp Channel Top Banner -->
-    <div id="wa-top-banner" class="wa-top-banner" style="display: none;">
+    <div id="wa-top-banner" class="wa-top-banner">
         <div class="wa-banner-content">
             <span class="wa-banner-badge"><i class="fab fa-whatsapp"></i> Update</span>
             <span class="wa-banner-text">Join our WhatsApp Channel for instant job alerts, class updates & free coding resources!</span>
@@ -871,13 +871,12 @@
     </div>
 
     <script>
+        // Check dismissal state immediately to prevent layout shift
+        if (localStorage.getItem('cn_whatsapp_banner_dismissed') === 'true') {
+            document.getElementById('wa-top-banner').style.display = 'none';
+        }
+        
         document.addEventListener('DOMContentLoaded', function () {
-            if (localStorage.getItem('cn_whatsapp_banner_dismissed') !== 'true') {
-                const banner = document.getElementById('wa-top-banner');
-                if (banner) {
-                    banner.style.display = 'flex';
-                }
-            }
             const closeBtn = document.getElementById('wa-banner-close');
             if (closeBtn) {
                 closeBtn.addEventListener('click', function () {
