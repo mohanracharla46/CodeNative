@@ -1392,6 +1392,7 @@ async def user_tasks_page(request: Request):
     # Fetch tasks sorted by date descending
     all_tasks = execute_query(conn, "SELECT * FROM tasks ORDER BY created_at DESC").fetchall()
     completed_task_ids = [row['task_id'] for row in execute_query(conn, "SELECT task_id FROM user_tasks WHERE user_id = ?", (user_id,)).fetchall()]
+    submitted_task_ids = [row['task_id'] for row in execute_query(conn, "SELECT task_id FROM task_submissions WHERE user_id = ?", (user_id,)).fetchall()]
     
     # Calculate total points
     total_points_res = execute_query(conn, "SELECT SUM(t.points) as points FROM user_tasks ut JOIN tasks t ON ut.task_id = t.id WHERE ut.user_id = ?", (user_id,)).fetchone()
@@ -1406,6 +1407,7 @@ async def user_tasks_page(request: Request):
     for t in all_tasks:
         td = dict(t)
         td['completed'] = t['id'] in completed_task_ids
+        td['submitted'] = t['id'] in submitted_task_ids
         created_date = str(t['created_at'])[:10] if t['created_at'] else 'No Date'
         
         try:
@@ -1451,8 +1453,9 @@ async def user_task_exam_page(task_id: int, request: Request):
         conn = get_db_connection()
         task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
         
-        # Check if already completed
+        # Check if already completed or submitted
         completed = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+        submitted = execute_query(conn, "SELECT id FROM task_submissions WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
         release_db_connection(conn)
         
         if not task:
@@ -1462,7 +1465,7 @@ async def user_task_exam_page(task_id: int, request: Request):
         if task_type != 'exam':
             return HTMLResponse("This task is not an exam.", status_code=404)
             
-        if completed:
+        if completed or submitted:
             return _redirect("/tasks")
             
         import json
@@ -1554,8 +1557,9 @@ async def user_task_coding_page(task_id: int, request: Request):
         conn = get_db_connection()
         task = execute_query(conn, "SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
         
-        # Check if already completed
+        # Check if already completed or submitted
         completed = execute_query(conn, "SELECT id FROM user_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
+        submitted = execute_query(conn, "SELECT id FROM task_submissions WHERE user_id = ? AND task_id = ?", (user_id, task_id)).fetchone()
         release_db_connection(conn)
         
         if not task:
@@ -1565,7 +1569,7 @@ async def user_task_coding_page(task_id: int, request: Request):
         if task_type != 'coding':
             return HTMLResponse("This task is not a coding test.", status_code=404)
             
-        if completed:
+        if completed or submitted:
             return _redirect("/tasks")
             
         import json
