@@ -160,10 +160,214 @@
             color: var(--text-dim);
             margin-top: 4px;
         }
+
+        /* WhatsApp Promo Card in Dashboard */
+        .wa-promo-card {
+            background: linear-gradient(135deg, rgba(18, 140, 126, 0.15), rgba(37, 211, 102, 0.08));
+            border: 1px solid rgba(37, 211, 102, 0.2);
+            border-radius: 16px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px -5px rgba(37, 211, 102, 0.05);
+            transition: all 0.3s ease;
+        }
+        .wa-promo-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(37, 211, 102, 0.4);
+            box-shadow: 0 12px 30px -5px rgba(37, 211, 102, 0.1);
+        }
+        .wa-promo-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: #25D366;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+        }
+        .wa-promo-info {
+            flex: 1;
+        }
+        .wa-promo-info h3 {
+            margin: 0 0 6px 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .wa-promo-info p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+        .wa-promo-btn {
+            background: #25D366;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+            white-space: nowrap;
+        }
+        .wa-promo-btn:hover {
+            background: #20ba5a;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3);
+        }
+        @media (max-width: 768px) {
+            .wa-promo-card {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 20px;
+                gap: 16px;
+            }
+            .wa-promo-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- WhatsApp Channel Top Banner Style -->
+    <style>
+        .wa-top-banner {
+            background: linear-gradient(135deg, #128c7e, #25D366);
+            color: #ffffff;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1001;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+            transition: all 0.3s ease;
+        }
+        .wa-banner-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .wa-banner-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .wa-banner-text {
+            color: rgba(255, 255, 255, 0.95);
+        }
+        .wa-banner-btn {
+            background: #ffffff;
+            color: #128c7e;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .wa-banner-btn:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .wa-banner-close {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 300;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            margin-left: 15px;
+        }
+        .wa-banner-close:hover {
+            opacity: 1;
+        }
+        @media (max-width: 768px) {
+            .wa-top-banner {
+                padding: 10px 16px;
+            }
+            .wa-banner-content {
+                font-size: 12.5px;
+                gap: 8px;
+                justify-content: flex-start;
+            }
+            .wa-banner-badge {
+                display: none;
+            }
+            .wa-banner-btn {
+                padding: 4px 10px;
+                font-size: 11px;
+            }
+        }
+    </style>
+
+    <!-- WhatsApp Channel Top Banner -->
+    <div id="wa-top-banner" class="wa-top-banner" style="display: none;">
+        <div class="wa-banner-content">
+            <span class="wa-banner-badge"><i class="fab fa-whatsapp"></i> Update</span>
+            <span class="wa-banner-text">Join our WhatsApp Channel for instant job alerts, class updates & free coding resources!</span>
+            <a href="https://whatsapp.com/channel/0029Vb7lp702P59gBIjIhx0O" target="_blank" rel="noopener noreferrer" class="wa-banner-btn">Join Now <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <button id="wa-banner-close" class="wa-banner-close" aria-label="Dismiss Banner">&times;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (localStorage.getItem('cn_whatsapp_banner_dismissed') !== 'true') {
+                const banner = document.getElementById('wa-top-banner');
+                if (banner) {
+                    banner.style.display = 'flex';
+                }
+            }
+            const closeBtn = document.getElementById('wa-banner-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                    const banner = document.getElementById('wa-top-banner');
+                    if (banner) {
+                        banner.style.display = 'none';
+                    }
+                    localStorage.setItem('cn_whatsapp_banner_dismissed', 'true');
+                });
+            }
+        });
+    </script>
 
     <header class="header">
         <div class="container header-inner">
@@ -284,7 +488,20 @@
                     <span class="welcome-eyebrow">Personal Dashboard</span>
                     <h1>Hello, <span class="welcome-name">{{ session.get('user_name', 'Scholar') }}</span> <span class="wave">👋</span></h1>
                     <p>Ready to continue your journey? You're doing great!</p>
+            </div>
+
+            <!-- WhatsApp Promo Card -->
+            <div class="wa-promo-card">
+                <div class="wa-promo-icon">
+                    <i class="fab fa-whatsapp"></i>
                 </div>
+                <div class="wa-promo-info">
+                    <h3>Join our WhatsApp Channel!</h3>
+                    <p>Job alerts, online classes schedule, updates, and free coding resources directly to your phone in Telugu. Stay ahead with regular updates!</p>
+                </div>
+                <a href="https://whatsapp.com/channel/0029Vb7lp702P59gBIjIhx0O" target="_blank" rel="noopener noreferrer" class="wa-promo-btn">
+                    Join Channel <i class="fas fa-external-link-alt"></i>
+                </a>
             </div>
 
             <!-- Stats Overview -->
@@ -705,6 +922,7 @@
         setInterval(fetchNotifications, 30000);
 
     </script>
+    <script src="/static/whatsapp-widget.js" defer></script>
 </body>
 
 </html>
