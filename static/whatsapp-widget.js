@@ -134,6 +134,9 @@
     closeBtn.id = 'wa-close-btn';
     closeBtn.innerHTML = '&times;';
     closeBtn.title = 'Dismiss';
+    closeBtn.setAttribute('role', 'button');
+    closeBtn.setAttribute('tabindex', '0');
+    closeBtn.setAttribute('aria-label', 'Dismiss WhatsApp widget');
     closeBtn.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();

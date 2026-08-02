@@ -1,21 +1,18 @@
-# Code Native
+# CodeNative
 
-Code Native is a premium educational platform providing high-quality coding tutorials in Telugu. We specialize in making complex programming concepts accessible to native Telugu speakers through interactive lessons and a built-in compiler.
+CodeNative is India's First Telugu Coding Learning Platform. It is a free, AI-powered platform designed to teach programming concepts to native Telugu speakers through structured interactive lessons, a built-in compiler, and AI doubts support.
 
-## Core Tutorials
-- C Programming: Fundamentals and advanced concepts.
-- Java: Object-oriented programming and application development.
-- Python: Modern scripting, automation, and logic building.
-- Web Development: HTML, CSS, and interactive JavaScript.
-- Roadmap: Step-by-step guidance for becoming a developer.
+## Interactive Coding Courses
+- [C Programming in Telugu](https://codenative.co.in/c.html) - Structured C language basics, pointers, and memory management.
+- [Java Programming in Telugu](https://codenative.co.in/java.html) - Object-Oriented Programming (OOP) principles, classes, and inheritance.
+- [Python Programming in Telugu](https://codenative.co.in/python.html) - Python syntax, logic building, data structures, and scripting.
+- [JavaScript in Telugu](https://codenative.co.in/js.html) - Modern interactive programming, DOM manipulation, and asynchronous JS.
+- [Web Development in Telugu](https://codenative.co.in/web.html) - HTML5 structures and CSS styling foundations.
 
-## Features
-- Interactive Compiler: Practice code directly in the browser.
-- Assignment Quizzes: Test your knowledge after each topic.
-- Telugu Documentation: Explanations in the native language.
-- User Dashboard: Track your learning progress and streaks.
-
-## Links
-- Homepage: https://codenative.co.in/
-- Roadmap: https://codenative.co.in/roadmap.html
-- Sign In: https://codenative.co.in/signin.html
+## Learning Tools & Navigation
+- [Online Compiler](https://codenative.co.in/compiler.html) - Practice and run code directly in the browser.
+- [Learning Roadmap](https://codenative.co.in/roadmap.html) - Structured guide mapping the journey to becoming a developer.
+- [AI Doubt Solver](https://codenative.co.in/doubts) - Ask coding doubts and get solutions in Telugu powered by AI.
+- [User Dashboard](https://codenative.co.in/dashboard) - Track learning progress, streaks, assignments, and tasks.
+- [Referral Center](https://codenative.co.in/referrals) - Refer friends and track referral program rewards.
+- [Sign In / Register](https://codenative.co.in/signin.html) - Access your personalized learning profile.

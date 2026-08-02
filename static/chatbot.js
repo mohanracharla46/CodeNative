@@ -188,7 +188,7 @@
     // ── Build HTML ────────────────────────────────────────────────────
     document.body.insertAdjacentHTML('beforeend', `
     <div id="cn-chat-hint">Ask in telugu</div>
-    <button id="cn-chat-fab" title="Ask AI Doubt">
+    <button id="cn-chat-fab" type="button" title="Ask AI Doubt" aria-label="Ask AI Doubt">
         <i class="${meta.icon}"></i>
         <span class="cn-badge">AI</span>
     </button>
@@ -200,7 +200,7 @@
                 <h3>CodeNative AI 🤖</h3>
                 <p>${meta.label} Coding Friend · Ela unnav? 😄</p>
             </div>
-            <button class="cn-close-btn" id="cn-close"><i class="fas fa-times"></i></button>
+            <button class="cn-close-btn" id="cn-close" type="button" aria-label="Close chat" title="Close chat"><i class="fas fa-times"></i></button>
         </div>
 
         <div id="cn-messages">
@@ -220,7 +220,7 @@
 
         <div class="cn-input-area">
             <textarea id="cn-input" rows="1" placeholder="Coding doubt adugu ra... 👋"></textarea>
-            <button id="cn-send"><i class="fas fa-paper-plane"></i></button>
+            <button id="cn-send" type="button" aria-label="Send message" title="Send message"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
     `);
