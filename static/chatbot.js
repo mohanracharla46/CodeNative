@@ -4,6 +4,7 @@
  * Self-contained – just include this script and it auto-injects the UI
  */
 
+window.addEventListener('load', () => {
 (function () {
     // ── Detect current language from the URL path or query string ──────
     const urlParams = new URLSearchParams(window.location.search);
@@ -398,3 +399,4 @@
         }
     }
 })();
+});

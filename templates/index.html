@@ -94,7 +94,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.3">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
@@ -1474,55 +1475,57 @@
         });
         {% endif %}
 
-        // Typing Animation
-        const words = ["Growth.", "Success.", "Innovation.", "Opportunity.", "Confidence."];
-        const typedEl = document.getElementById('typed');
+        window.addEventListener('DOMContentLoaded', () => {
+            // Typing Animation
+            const words = ["Growth.", "Success.", "Innovation.", "Opportunity.", "Confidence."];
+            const typedEl = document.getElementById('typed');
 
-        const TYPING_SPEED = 80;
-        const DELETING_SPEED = 40;
-        const HOLD_DELAY = 1400;
+            const TYPING_SPEED = 80;
+            const DELETING_SPEED = 40;
+            const HOLD_DELAY = 1400;
 
-        let wordIndex = 0;
-        let charIndex = 0;
-        let typing = true;
+            let wordIndex = 0;
+            let charIndex = 0;
+            let typing = true;
 
-        function type() {
-            const current = words[wordIndex];
-            if (typing) {
-                if (charIndex < current.length) {
-                    typedEl.textContent += current.charAt(charIndex);
-                    charIndex++;
-                    setTimeout(type, TYPING_SPEED);
+            function type() {
+                const current = words[wordIndex];
+                if (typing) {
+                    if (charIndex < current.length) {
+                        typedEl.textContent += current.charAt(charIndex);
+                        charIndex++;
+                        setTimeout(type, TYPING_SPEED);
+                    } else {
+                        typing = false;
+                        setTimeout(type, HOLD_DELAY);
+                    }
                 } else {
-                    typing = false;
-                    setTimeout(type, HOLD_DELAY);
-                }
-            } else {
-                if (charIndex > 0) {
-                    typedEl.textContent = current.substring(0, charIndex - 1);
-                    charIndex--;
-                    setTimeout(type, DELETING_SPEED);
-                } else {
-                    typing = true;
-                    wordIndex = (wordIndex + 1) % words.length;
-                    setTimeout(type, TYPING_SPEED);
+                    if (charIndex > 0) {
+                        typedEl.textContent = current.substring(0, charIndex - 1);
+                        charIndex--;
+                        setTimeout(type, DELETING_SPEED);
+                    } else {
+                        typing = true;
+                        wordIndex = (wordIndex + 1) % words.length;
+                        setTimeout(type, TYPING_SPEED);
+                    }
                 }
             }
-        }
 
-        setTimeout(type, 500);
+            setTimeout(type, 500);
 
-        // Scroll Reveal Animation
-        const revealElements = document.querySelectorAll('.reveal-left, .reveal-right, .reveal-up');
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('reveal-active');
-                }
-            });
-        }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+            // Scroll Reveal Animation
+            const revealElements = document.querySelectorAll('.reveal-left, .reveal-right, .reveal-up');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-active');
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
 
-        revealElements.forEach(el => revealObserver.observe(el));
+            revealElements.forEach(el => revealObserver.observe(el));
+        });
 
 
     </script>

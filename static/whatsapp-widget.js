@@ -2,6 +2,7 @@
  * CodeNative WhatsApp Channel Floating Widget
  * Auto-injects a premium floating button on the bottom-left linking to the WhatsApp channel.
  */
+window.addEventListener('load', () => {
 (function () {
     // Check if dismissed
     if (localStorage.getItem('cn_whatsapp_widget_dismissed') === 'true') {
@@ -153,3 +154,4 @@
     container.appendChild(tooltip);
     document.body.appendChild(container);
 })();
+});
