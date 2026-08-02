@@ -65,6 +65,7 @@ class JSONResponse(_StarletteJSONResponse):
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 # Google OAuth imports
 from google_auth_oauthlib.flow import Flow
@@ -76,6 +77,9 @@ load_dotenv()
 # ─── App setup ───────────────────────────────────────────────────────────────
 app = FastAPI()
 
+# Add Gzip compression middleware
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 SECRET_KEY = os.environ.get('SECRET_KEY', 'codenative_fallback_secret_key_secure_12345')
 app.add_middleware(
     SessionMiddleware,
@@ -84,8 +88,15 @@ app.add_middleware(
     https_only=False,
 )
 
+# Custom StaticFiles implementation with 30-day Cache-Control header
+class CachedStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "public, max-age=2592000"
+        return response
+
 # Static files and templates
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", CachedStaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 # Make ga_id available globally in every template
 templates.env.globals["ga_id"] = "G-YHH2J3PXVZ"
@@ -1911,15 +1922,32 @@ async def log_study(request: Request):
     return JSONResponse({"status": "unauthorized"}, status_code=401)
 
 
+_homepage_counts_cache = None
+_homepage_counts_expiry = 0
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
+    global _homepage_counts_cache, _homepage_counts_expiry
     logout_msg = request.session.pop('logout_message', None)
-    conn   = get_db_connection()
-    counts = {l: 0 for l in ['c', 'java', 'python', 'web', 'js']}
-    for row in execute_query(conn, 'SELECT language, COUNT(DISTINCT user_id) as count FROM user_progress GROUP BY language').fetchall():
-        if row['language'] in counts:
-            counts[row['language']] = row['count']
-    release_db_connection(conn)
+    
+    now = time.time()
+    if _homepage_counts_cache is None or now > _homepage_counts_expiry:
+        conn = get_db_connection()
+        counts = {l: 0 for l in ['c', 'java', 'python', 'web', 'js']}
+        try:
+            for row in execute_query(conn, 'SELECT language, COUNT(DISTINCT user_id) as count FROM user_progress GROUP BY language').fetchall():
+                if row['language'] in counts:
+                    counts[row['language']] = row['count']
+            _homepage_counts_cache = counts
+            _homepage_counts_expiry = now + 300  # Cache for 5 minutes
+        except Exception as e:
+            print(f"Error querying homepage counts: {e}")
+            if _homepage_counts_cache is None:
+                _homepage_counts_cache = counts
+        finally:
+            release_db_connection(conn)
+    else:
+        counts = _homepage_counts_cache
 
     reviews = [
         {"name": "Sagar",           "rating": 5, "message": "Great platform for learning coding in Telugu! Clear tutorials, interactive compiler, and covers all major languages. Highly recommended for beginners!", "role": "Independent Scholar",             "date": "2026-05-05", "initial": "S"},

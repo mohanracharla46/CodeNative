@@ -437,9 +437,9 @@ const TutorialLoader = {
             <div class="social-proof-container">
                 <div class="social-proof">
                     <div class="avatar-stack">
-                        <img src="/static/images/avatar1.png" alt="Student">
-                        <img src="/static/images/avatar2.png" alt="Student">
-                        <img src="/static/images/avatar3.png" alt="Student">
+                        <img src="/static/images/avatar1.webp" alt="Student" width="32" height="32" loading="lazy">
+                        <img src="/static/images/avatar2.webp" alt="Student" width="32" height="32" loading="lazy">
+                        <img src="/static/images/avatar3.webp" alt="Student" width="32" height="32" loading="lazy">
                     </div>
                     <div class="student-count">500+ students completed this lesson</div>
                 </div>

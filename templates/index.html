@@ -93,11 +93,13 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.3">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+    <script src="{{ url_for('static', filename='theme.js') }}" defer></script>
     <style>
         @keyframes cursorBlink {
 
@@ -907,7 +909,7 @@
     <header class="header">
         <div class="container header-inner">
             <a href="/" class="logo"><img src="{{ url_for('static', filename='images/CodeNative.png') }}"
-                    alt="Code Native"></a>
+                    alt="Code Native" width="70" height="48"></a>
 
             <!-- Mobile Menu Toggle -->
             <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle Menu"
@@ -981,7 +983,7 @@
                 </div>
 
                 <div class="hero-visual">
-                    <img src="{{ url_for('static', filename='images/hero-girl.png') }}" alt="CodeNative Student" class="main-girl-img">
+                    <img src="{{ url_for('static', filename='images/hero-girl.webp') }}" alt="CodeNative Student" class="main-girl-img" width="500" height="500" fetchpriority="high">
                     
                     <!-- Floating Cards -->
                     <div class="floating-card card-python">
@@ -1408,7 +1410,7 @@
             <div class="footer-content">
                 <div class="footer-logo">
                     <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"
-                        style="height: 48px; margin-bottom: 15px;">
+                        style="height: 48px; margin-bottom: 15px;" width="70" height="48" loading="lazy" decoding="async">
                     <p>Empowering the next generation of developers with localized learning.</p>
                 </div>
                 <div class="footer-links">
