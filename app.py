@@ -77,6 +77,30 @@ load_dotenv()
 # ─── App setup ───────────────────────────────────────────────────────────────
 app = FastAPI()
 
+# Add security headers middleware (HSTS is handled at the hosting layer and preserved)
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    csp_policy = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdnjs.cloudflare.com https://accounts.google.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
+        "img-src 'self' data: https: https://ui-avatars.com https://www.google-analytics.com https://www.googletagmanager.com; "
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
+        "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://www.googleapis.com; "
+        "frame-src 'self' https://accounts.google.com; "
+        "object-src 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'; "
+        "frame-ancestors 'none';"
+    )
+    response.headers["Content-Security-Policy-Report-Only"] = csp_policy
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
+    return response
+
 # Add Gzip compression middleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
