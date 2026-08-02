@@ -94,7 +94,7 @@ async def add_security_headers(request: Request, call_next):
         "form-action 'self'; "
         "frame-ancestors 'none';"
     )
-    response.headers["Content-Security-Policy-Report-Only"] = csp_policy
+    response.headers["Content-Security-Policy"] = csp_policy
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
