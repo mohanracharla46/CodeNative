@@ -669,14 +669,14 @@ body.dark-mode .editor-toolbar { background: rgba(15, 23, 42, 0.5); }
 }
 
 .chart-card {
-    min-height: 400px;
+    min-height: 380px;
     display: flex;
     flex-direction: column;
 }
 
 .chart-card canvas {
-    flex: 1;
     max-height: 300px;
+    width: 100% !important;
 }
 
 .stats-mini-card {

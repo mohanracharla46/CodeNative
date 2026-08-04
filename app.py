@@ -2361,6 +2361,31 @@ async def admin_dashboard(request: Request):
     career_apps = execute_query(conn, "SELECT ca.*, c.title as career_title, c.type as career_type FROM career_applications ca LEFT JOIN careers c ON ca.career_id = c.id ORDER BY ca.id DESC").fetchall()
     release_db_connection(conn)
 
+    from datetime import date, timedelta
+    today_date = date.today()
+    last_7_days = [(today_date - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(6, -1, -1)]
+
+    ug_map = {}
+    for r in user_growth:
+        try:
+            d = dict(r)
+            if d.get('date'):
+                ug_map[str(d['date'])] = d.get('count', 0)
+        except Exception:
+            pass
+
+    pt_map = {}
+    for r in practice_trends:
+        try:
+            d = dict(r)
+            if d.get('date'):
+                pt_map[str(d['date'])] = d.get('count', 0)
+        except Exception:
+            pass
+
+    formatted_user_growth = [{"date": d, "count": ug_map.get(d, 0)} for d in last_7_days]
+    formatted_practice_trends = [{"date": d, "count": pt_map.get(d, 0)} for d in last_7_days]
+
     def _cnt(r):
         if r is None: return 0
         try:    return r['count']
@@ -2372,16 +2397,17 @@ async def admin_dashboard(request: Request):
     if lw > 0:   growth_rate = round(((tw - lw) / lw) * 100, 1)
     elif tw > 0: growth_rate = 100.0
     engagement_rate = round((dau / users_count) * 100) if users_count > 0 else 0
-    top_lang = lang_labels[lang_counts.index(max(lang_counts))] if lang_counts else "N/A"
+    top_lang = lang_labels[lang_counts.index(max(lang_counts))] if (lang_counts and max(lang_counts) > 0) else "N/A"
     avg_session = 12
-    if wau > 0 and practice_trends:
-        total_p = sum(pt['count'] for pt in practice_trends)
+    if wau > 0 and formatted_practice_trends:
+        total_p = sum(pt['count'] for pt in formatted_practice_trends)
         avg_session = max(5, min(60, round((total_p * 3) / wau)))
 
     analytics = {
-        "lang_labels": lang_labels, "lang_counts": lang_counts,
-        "user_growth":     _jsonify_dates([dict(r) for r in user_growth]),
-        "practice_trends": _jsonify_dates([dict(r) for r in practice_trends]),
+        "lang_labels": lang_labels if lang_labels else ["No Content"],
+        "lang_counts": lang_counts if lang_counts else [1],
+        "user_growth":     _jsonify_dates(formatted_user_growth),
+        "practice_trends": _jsonify_dates(formatted_practice_trends),
         "user_growth_rate": growth_rate, "dau": dau, "wau": wau,
         "engagement_rate": engagement_rate, "top_lang": top_lang, "avg_session": avg_session
     }

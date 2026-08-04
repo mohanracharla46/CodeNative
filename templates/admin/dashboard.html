@@ -108,13 +108,15 @@
                     <div class="section-header">
                         <h2>User Growth (Last 7 Days)</h2>
                     </div>
-                    <canvas id="userGrowthChart"></canvas>
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="userGrowthChart"></canvas>
+                    </div>
                 </div>
                 <div class="section-card chart-card">
                     <div class="section-header">
                         <h2>Content Distribution</h2>
                     </div>
-                    <div style="height: 300px; display: flex; justify-content: center;">
+                    <div style="position: relative; height: 300px; width: 100%; display: flex; align-items: center; justify-content: center;">
                         <canvas id="langDistChart"></canvas>
                     </div>
                 </div>
@@ -1640,98 +1642,121 @@
         const secondaryColor = '#8b5cf6';
         const successColor = '#10b981';
         const warningColor = '#f59e0b';
+        const infoColor = '#3b82f6';
+        const pinkColor = '#ec4899';
         
-        // Chart Defaults
-        Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = document.body.classList.contains('dark-mode') ? '#94a3b8' : '#64748b';
+        if (typeof Chart !== 'undefined' && analyticsData) {
+            try {
+                // Chart Defaults
+                Chart.defaults.font.family = "'Inter', sans-serif";
+                Chart.defaults.color = document.body.classList.contains('dark-mode') ? '#94a3b8' : '#64748b';
 
-        // 1. User Growth Chart
-        const growthCtx = document.getElementById('userGrowthChart').getContext('2d');
-        new Chart(growthCtx, {
-            type: 'line',
-            data: {
-                labels: analyticsData.user_growth.map(d => d.date),
-                datasets: [{
-                    label: 'New Registrations',
-                    data: analyticsData.user_growth.map(d => d.count),
-                    borderColor: primaryColor,
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointBackgroundColor: primaryColor
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { display: false } },
-                    x: { grid: { display: false } }
+                // 1. User Growth Chart
+                const userGrowthCanvas = document.getElementById('userGrowthChart');
+                if (userGrowthCanvas) {
+                    const growthCtx = userGrowthCanvas.getContext('2d');
+                    new Chart(growthCtx, {
+                        type: 'line',
+                        data: {
+                            labels: (analyticsData.user_growth || []).map(d => d.date),
+                            datasets: [{
+                                label: 'New Registrations',
+                                data: (analyticsData.user_growth || []).map(d => d.count),
+                                borderColor: primaryColor,
+                                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointBackgroundColor: primaryColor
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1 } },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
                 }
-            }
-        });
 
-        // 2. Language Distribution Chart
-        const distCtx = document.getElementById('langDistChart').getContext('2d');
-        new Chart(distCtx, {
-            type: 'doughnut',
-            data: {
-                labels: analyticsData.lang_labels,
-                datasets: [{
-                    data: analyticsData.lang_counts,
-                    backgroundColor: [primaryColor, successColor, warningColor, secondaryColor],
-                    borderWidth: 0,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
-                },
-                cutout: '70%'
-            }
-        });
-
-        // 3. Practice Trends Chart
-        const trendsCtx = document.getElementById('practiceTrendsChart').getContext('2d');
-        new Chart(trendsCtx, {
-            type: 'bar',
-            data: {
-                labels: analyticsData.practice_trends.map(d => d.date),
-                datasets: [{
-                    label: 'Code Executions',
-                    data: analyticsData.practice_trends.map(d => d.count),
-                    backgroundColor: primaryColor,
-                    borderRadius: 8,
-                    barThickness: 30
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    title: { display: true, text: 'Daily Practice Activity', font: { size: 16, weight: 'bold' } },
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
-                    x: { grid: { display: false } }
+                // 2. Language Distribution Chart
+                const langDistCanvas = document.getElementById('langDistChart');
+                if (langDistCanvas) {
+                    const distCtx = langDistCanvas.getContext('2d');
+                    const labels = (analyticsData.lang_labels && analyticsData.lang_labels.length) ? analyticsData.lang_labels : ['No Data'];
+                    const counts = (analyticsData.lang_counts && analyticsData.lang_counts.length) ? analyticsData.lang_counts : [1];
+                    new Chart(distCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: counts,
+                                backgroundColor: [primaryColor, successColor, warningColor, secondaryColor, infoColor, pinkColor],
+                                borderWidth: 0,
+                                hoverOffset: 10
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                            },
+                            cutout: '70%'
+                        }
+                    });
                 }
-            }
-        });
 
-        // Update total practices count
-        const totalPractices = analyticsData.practice_trends.reduce((acc, curr) => acc + curr.count, 0);
-        document.getElementById('total-practices-count').textContent = totalPractices;
-        
-        // Find top language
-        const maxIdx = analyticsData.lang_counts.indexOf(Math.max(...analyticsData.lang_counts));
-        if (maxIdx !== -1) {
-            document.getElementById('top-lang').textContent = analyticsData.lang_labels[maxIdx];
+                // 3. Practice Trends Chart
+                const trendsCanvas = document.getElementById('practiceTrendsChart');
+                if (trendsCanvas) {
+                    const trendsCtx = trendsCanvas.getContext('2d');
+                    new Chart(trendsCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: (analyticsData.practice_trends || []).map(d => d.date),
+                            datasets: [{
+                                label: 'Code Executions',
+                                data: (analyticsData.practice_trends || []).map(d => d.count),
+                                backgroundColor: primaryColor,
+                                borderRadius: 8,
+                                barThickness: 30
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: { display: true, text: 'Daily Practice Activity', font: { size: 16, weight: 'bold' } },
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+
+                // Update total practices count
+                if (analyticsData.practice_trends && document.getElementById('total-practices-count')) {
+                    const totalPractices = analyticsData.practice_trends.reduce((acc, curr) => acc + (curr.count || 0), 0);
+                    document.getElementById('total-practices-count').textContent = totalPractices;
+                }
+                
+                // Find top language
+                if (analyticsData.lang_counts && analyticsData.lang_labels && document.getElementById('top-lang')) {
+                    const maxIdx = analyticsData.lang_counts.indexOf(Math.max(...analyticsData.lang_counts));
+                    if (maxIdx !== -1 && analyticsData.lang_counts[maxIdx] > 0) {
+                        document.getElementById('top-lang').textContent = analyticsData.lang_labels[maxIdx];
+                    }
+                }
+            } catch(e) {
+                console.error("Error rendering charts:", e);
+            }
         }
         // Theme Toggle Logic
         const themeToggle = document.getElementById('theme-toggle');
