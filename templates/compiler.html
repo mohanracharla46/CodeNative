@@ -6,27 +6,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Online Code Compiler & Playground | Code Native</title>
-    <meta name="title" content="Online Code Compiler & Playground | Code Native">
-    <meta name="description" content="Write, run, and test your C, C++, Java, Python, and JavaScript code online with our fast web compiler and IDE.">
-    <meta name="keywords" content="online compiler, online IDE, run Python online, run C online, run Java online, run JS online, free compiler, web compiler, Code Native">
+    <title>{{ meta_title|default("Online Code Compiler & IDE | Code Native Telugu") }}</title>
+    <meta name="title" content="{{ meta_title|default('Online Code Compiler & IDE | Code Native Telugu') }}">
+    <meta name="description" content="{{ meta_desc|default('Write, run, and test your C, C++, Java, Python, and JavaScript code online with our fast web compiler and IDE.') }}">
+    <meta name="keywords" content="online compiler, online python compiler, online java compiler, online c compiler, online cpp compiler, online javascript compiler, run code online, online IDE, code native compiler">
     <meta name="author" content="Code Native">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://codenative.co.in/compiler.html">
+    <link rel="canonical" href="{{ canonical_url|default('https://codenative.co.in/compiler.html') }}">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://codenative.co.in/compiler.html">
-    <meta property="og:title" content="Online Code Compiler & Playground | Code Native">
-    <meta property="og:description" content="Use Code Native's online multi-language IDE and code compiler. Run Python, Java, C, C++, and JavaScript code instantly in the browser.">
+    <meta property="og:url" content="{{ canonical_url|default('https://codenative.co.in/compiler.html') }}">
+    <meta property="og:title" content="{{ meta_title|default('Online Code Compiler & IDE | Code Native Telugu') }}">
+    <meta property="og:description" content="{{ meta_desc|default('Use Code Native online multi-language IDE and code compiler. Run Python, Java, C, C++, and JavaScript code instantly in the browser.') }}">
     <meta property="og:image" content="/static/images/LMS image.jpg">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://codenative.co.in/compiler.html">
-    <meta name="twitter:title" content="Online Code Compiler & Playground | Code Native">
-    <meta name="twitter:description" content="Write, run, and test your code online in your browser with our fast, free multi-language compiler.">
+    <meta name="twitter:url" content="{{ canonical_url|default('https://codenative.co.in/compiler.html') }}">
+    <meta name="twitter:title" content="{{ meta_title|default('Online Code Compiler & IDE | Code Native Telugu') }}">
+    <meta name="twitter:description" content="{{ meta_desc|default('Write, run, and test your code online in your browser with our fast, free multi-language compiler.') }}">
     <meta name="twitter:image" content="/static/images/LMS image.jpg">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "{{ target_lang_name|default('Multi-Language') }} Online Compiler - Code Native",
+      "operatingSystem": "Web Browser",
+      "applicationCategory": "DeveloperApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      },
+      "description": "{{ meta_desc|default('Free online code compiler and IDE for Python, Java, C, C++, and JavaScript.') }}"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://codenative.co.in/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Compilers",
+          "item": "https://codenative.co.in/compiler.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "{{ target_lang_name|default('Online Compiler') }}",
+          "item": "{{ canonical_url|default('https://codenative.co.in/compiler.html') }}"
+        }
+      ]
+    }
+    </script>
 
     <link rel="icon" href="/static/images/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -66,8 +109,16 @@
     <div class="compiler-page">
         <div class="compiler-hero">
             <div class="compiler-badge">Powerful & Instant</div>
-            <h1>Online Code Compiler</h1>
+            <h1>Online {{ target_lang_name|default('Code') }} Compiler</h1>
             <p>Master your craft with our high-performance interactive coding playground. Write, test, and run code instantly without any setup.</p>
+            
+            <div class="compiler-pills" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px;">
+                <a href="/online-python-compiler" style="padding: 8px 16px; background: rgba(99,102,241,0.12); color: #818cf8; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 0.85rem; border: 1px solid rgba(99,102,241,0.3);">Python Compiler</a>
+                <a href="/online-java-compiler" style="padding: 8px 16px; background: rgba(245,158,11,0.12); color: #fbbf24; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 0.85rem; border: 1px solid rgba(245,158,11,0.3);">Java Compiler</a>
+                <a href="/online-c-compiler" style="padding: 8px 16px; background: rgba(56,189,248,0.12); color: #38bdf8; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 0.85rem; border: 1px solid rgba(56,189,248,0.3);">C Compiler</a>
+                <a href="/online-cpp-compiler" style="padding: 8px 16px; background: rgba(236,72,153,0.12); color: #f472b6; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 0.85rem; border: 1px solid rgba(236,72,153,0.3);">C++ Compiler</a>
+                <a href="/online-javascript-compiler" style="padding: 8px 16px; background: rgba(247,223,30,0.12); color: #facc15; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 0.85rem; border: 1px solid rgba(247,223,30,0.3);">JavaScript Compiler</a>
+            </div>
         </div>
 
         <div class="playground-container">
@@ -91,11 +142,11 @@
                 <div class="playground-controls">
                     <div class="lang-selector">
                         <select id="lang">
-                            <option value="71">Python 3</option>
-                            <option value="62">Java (OpenJDK 13)</option>
-                            <option value="50">C (GCC 9.2.0)</option>
-                            <option value="54">C++ (GCC 9.2.0)</option>
-                            <option value="63">JavaScript (Node.js 12)</option>
+                            <option value="71" {% if active_lang == 'python' %}selected{% endif %}>Python 3</option>
+                            <option value="62" {% if active_lang == 'java' %}selected{% endif %}>Java (OpenJDK 13)</option>
+                            <option value="50" {% if active_lang == 'c' %}selected{% endif %}>C (GCC 9.2.0)</option>
+                            <option value="54" {% if active_lang == 'cpp' %}selected{% endif %}>C++ (GCC 9.2.0)</option>
+                            <option value="63" {% if active_lang == 'js' %}selected{% endif %}>JavaScript (Node.js 12)</option>
                         </select>
                     </div>
                     <button id="clearBtn" class="btn-playground-clear">Clear</button>
