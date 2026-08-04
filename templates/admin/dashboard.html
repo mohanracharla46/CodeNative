@@ -9,6 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        if (typeof Chart === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"><\/script>');
+        }
+    </script>
+    <script>
+        if (typeof Chart === 'undefined') {
+            document.write('<script src="https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js"><\/script>');
+        }
+    </script>
 </head>
 <body class="admin-body">
 
@@ -1757,6 +1767,12 @@
             } catch(e) {
                 console.error("Error rendering charts:", e);
             }
+        } else if (typeof Chart === 'undefined') {
+            document.querySelectorAll('#userGrowthChart, #langDistChart, #practiceTrendsChart').forEach(c => {
+                if (c && c.parentElement) {
+                    c.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--admin-text-dim);font-size:0.85rem;text-align:center;padding:20px;"><i class="fas fa-exclamation-circle" style="margin-right:8px;color:#f59e0b;"></i> Chart script could not be loaded. Please refresh or check CDN connection.</div>';
+                }
+            });
         }
         // Theme Toggle Logic
         const themeToggle = document.getElementById('theme-toggle');
