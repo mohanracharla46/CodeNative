@@ -282,8 +282,16 @@ body {
 }
 
 #topicContent p {
-    margin-bottom: 1.5em;
+    margin-bottom: 0.85em;
 }
+
+/* Hide empty paragraphs and blank line breaks from pasted ChatGPT text */
+#topicContent p:empty,
+#topicContent p:has(> br:only-child) {
+    display: none;
+    margin: 0;
+}
+
 
 #topicContent ul, #topicContent ol {
     margin-bottom: 1.25em;
