@@ -1746,3 +1746,108 @@ h1 {
     color: var(--text-main, #f8fafc);
     font-weight: 600;
 }
+
+/* Global Container Utility */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+}
+
+/* FAQ Section & Cards */
+.faq-section {
+    padding: 80px 0;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.faq-section .section-title {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.faq-section .section-title .badge {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.faq-section .section-title h2 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-top: 12px;
+    margin-bottom: 10px;
+}
+
+.faq-section .section-title p {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.faq-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    gap: 20px;
+}
+
+.faq-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 26px 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+}
+
+.faq-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.08);
+}
+
+.faq-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.faq-card p {
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin: 0;
+}
+
+.faq-card p a {
+    color: #6366f1;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+    .faq-section {
+        padding: 50px 0;
+    }
+    
+    .faq-section .section-title h2 {
+        font-size: 1.75rem;
+    }
+    
+    .faq-card {
+        padding: 20px;
+    }
+}
