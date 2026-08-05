@@ -30,7 +30,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="/static/dashboard.css">
+    <link rel="stylesheet" href="/static/dashboard.css?v=1.5">
     <link rel="icon" href="/static/images/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="/static/theme.js"></script>
@@ -607,9 +607,7 @@
                     </div>
 
                     <div class="heatmap-container">
-                        <div class="heatmap-months">
-                            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
-                        </div>
+                        <div class="heatmap-months" id="heatmapMonths"></div>
                         <div class="heatmap-grid" id="heatmapGrid">
                             <!-- Squares will be generated here -->
                         </div>
@@ -780,13 +778,23 @@
             }
         });
 
-        // Build a 53-week grid (371 squares) ending today
-        const TOTAL_SQUARES = 53 * 7;
+        // Build a 53-week grid (371 squares) ending today, aligned to Sunday
+        const TOTAL_WEEKS = 53;
+        const TOTAL_SQUARES = TOTAL_WEEKS * 7;
         const today = new Date();
 
-        // Align start to Sunday so weeks form clean columns
+        // Calculate exact start date: go back 52 full weeks + align to Sunday of that week
         const startDate = new Date(today);
-        startDate.setDate(today.getDate() - TOTAL_SQUARES + 1);
+        const todayDayOfWeek = today.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+        startDate.setDate(today.getDate() - (52 * 7) - todayDayOfWeek);
+
+        const monthContainer = document.getElementById('heatmapMonths');
+        if (monthContainer) {
+            monthContainer.innerHTML = '';
+        }
+
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let lastMonth = -1;
 
         for (let i = 0; i < TOTAL_SQUARES; i++) {
             const sq = document.createElement('div');
@@ -794,6 +802,21 @@
 
             const cellDate = new Date(startDate);
             cellDate.setDate(startDate.getDate() + i);
+
+            const weekIndex = Math.floor(i / 7);
+            const dayInWeek = i % 7;
+
+            // Dynamically place month labels above week columns where a new month starts
+            if (dayInWeek === 0 && monthContainer) {
+                const currentMonth = cellDate.getMonth();
+                if (currentMonth !== lastMonth) {
+                    const mSpan = document.createElement('span');
+                    mSpan.textContent = monthNames[currentMonth];
+                    mSpan.style.gridColumnStart = weekIndex + 1;
+                    monthContainer.appendChild(mSpan);
+                    lastMonth = currentMonth;
+                }
+            }
 
             // Build YYYY-MM-DD in LOCAL time (avoids UTC-offset shift)
             const yr  = cellDate.getFullYear();
@@ -810,7 +833,7 @@
             else if (count > 0) sq.classList.add('level-1');
             else                sq.classList.add('level-0');
 
-            // Tooltip: "Mon, 2025-04-30: 3 practices"
+            // Tooltip: "Mon, 2026-04-30: 3 practices"
             const dayName = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][cellDate.getDay()];
             const label   = count === 1 ? '1 practice' : `${count} practices`;
             sq.title = `${dayName}, ${dateString}: ${label}`;
