@@ -256,6 +256,12 @@ const TutorialLoader = {
         try {
             const topicIndex = el ? parseInt(el.dataset.index) : 0;
 
+            // Show SEO Course Overview & FAQ section ONLY on the 1st overview topic (index 0), hide on all other lessons
+            const seoOverview = document.querySelector('.seo-course-overview');
+            if (seoOverview) {
+                seoOverview.style.display = (topicIndex === 0) ? 'block' : 'none';
+            }
+
             // UI state update
             document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
             if (el) el.classList.add('active');
