@@ -352,6 +352,30 @@ def init_db():
         )
     '''
 
+    videos_sql = '''
+        CREATE TABLE IF NOT EXISTS videos (
+            id SERIAL PRIMARY KEY,
+            language TEXT NOT NULL,
+            title TEXT NOT NULL,
+            youtube_url TEXT NOT NULL,
+            description TEXT,
+            topic_slug TEXT,
+            order_index INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS videos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            language TEXT NOT NULL,
+            title TEXT NOT NULL,
+            youtube_url TEXT NOT NULL,
+            description TEXT,
+            topic_slug TEXT,
+            order_index INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
@@ -368,12 +392,14 @@ def init_db():
         cursor.execute(task_submissions_sql)
         cursor.execute(doubts_sql)
         cursor.execute(user_notifications_sql)
+        cursor.execute(videos_sql)
         
         # Create indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_videos_language ON videos(language)")
         
         # Check and add missing columns to users table
         cols_to_check = {
@@ -421,12 +447,14 @@ def init_db():
         conn.execute(task_submissions_sql)
         conn.execute(doubts_sql)
         conn.execute(user_notifications_sql)
+        conn.execute(videos_sql)
         
         # Create indexes
         conn.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_videos_language ON videos(language)")
         
         cursor = conn.execute("PRAGMA table_info(users)")
         existing_cols = [col[1] for col in cursor.fetchall()]

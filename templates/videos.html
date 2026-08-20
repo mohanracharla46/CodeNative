@@ -3,184 +3,692 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Native | Learn Coding in Telugu - Free AI Powered Platform</title>
-    <meta name="title" content="Code Native | Learn Coding in Telugu - Free AI Powered Platform">
-    <meta name="description" content="Code Native is India's First Telugu Coding Learning Platform. Learn C, Java, Python, HTML, CSS and JavaScript in Telugu for FREE. AI powered doubt solving, online compiler and structured roadmap — all in Telugu.">
-    <meta name="keywords" content="learn coding in Telugu, Telugu programming tutorials, free coding platform Telugu, AI coding assistant Telugu, C programming Telugu, Java tutorial Telugu, Python Telugu, web development Telugu, online compiler Telugu, Code Native, programming for beginners Telugu, Telugu coding platform, India first Telugu coding">
+    {% include 'analytics.html' %}
+    <title>Video Tutorials in Telugu | Code Native</title>
+    <meta name="title" content="Video Tutorials in Telugu | Code Native">
+    <meta name="description" content="Watch free Telugu programming video tutorials for Python, Java, C, JavaScript, and Web Development on Code Native.">
+    <meta name="keywords" content="learn coding in Telugu, Telugu programming videos, Python Telugu videos, Java Telugu videos, C language Telugu videos, web development Telugu videos, Code Native videos">
     <meta name="author" content="Code Native">
     <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://codenative.co.in/videos.html">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://codenative.co.in/videos.html">
-    <meta property="og:title" content="Code Native | Learn Coding in Telugu - Free & AI Powered">
-    <meta property="og:description" content="India's First Telugu Coding Platform — Learn C, Java, Python, HTML & JavaScript in Telugu. AI powered doubt solving. 100% Free. 100+ students already learning!">
+    <meta property="og:title" content="Video Tutorials in Telugu | Code Native">
+    <meta property="og:description" content="Watch step-by-step programming video tutorials in Telugu for Python, Java, C, and Web Dev.">
     <meta property="og:image" content="/static/images/LMS image.jpg">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://codenative.co.in/videos.html">
-    <meta name="twitter:title" content="Code Native | Learn Coding in Telugu - Free & AI Powered">
-    <meta name="twitter:description" content="India's First Telugu Coding Platform — Learn coding in Telugu with AI powered doubt solving. 100% Free forever!">
+    <meta name="twitter:title" content="Video Tutorials in Telugu | Code Native">
+    <meta name="twitter:description" content="Learn programming with free video tutorials in Telugu on Code Native!">
     <meta name="twitter:image" content="/static/images/LMS image.jpg">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    
     <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
         body {
-            background: #f8fafc;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-color: var(--bg-main);
+            color: var(--text-main);
             font-family: 'Inter', sans-serif;
             margin: 0;
-            overflow: hidden;
+            padding: 0;
+            min-height: 100vh;
         }
 
-        .container {
-            text-align: center;
-            padding: 40px;
-            max-width: 600px;
-            width: 90%;
-            background: white;
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-            position: relative;
-            z-index: 1;
-        }
-
-        .icon-box {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border-radius: 24px;
+        /* Top Header / Navigation */
+        .video-nav {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 24px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px;
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
-            animation: float 3s ease-in-out infinite;
+            justify-content: space-between;
         }
 
-        .icon-box i {
-            font-size: 42px;
+        .video-nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
             color: white;
-        }
-
-        h1 {
-            font-size: 32px;
             font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 16px;
-            letter-spacing: -0.02em;
+            font-size: 1.25rem;
         }
 
-        p {
-            font-size: 18px;
-            color: #64748b;
-            line-height: 1.6;
-            margin-bottom: 32px;
+        .video-nav-brand img {
+            height: 32px;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #f1f5f9;
-            color: #6366f1;
+        .video-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .video-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .video-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .video-nav-btn.primary {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        }
+
+        .video-nav-btn.primary:hover {
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            padding: 50px 24px 30px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
             border-radius: 100px;
-            font-size: 13px;
+            font-size: 0.82rem;
             font-weight: 700;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
             margin-bottom: 20px;
         }
 
-        .btn {
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin: 0 0 16px;
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            margin: 0 auto 30px;
+            max-width: 680px;
+            line-height: 1.6;
+        }
+
+        /* Language Filter Tabs */
+        .filter-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .filter-tab {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 14px 28px;
-            background: #0f172a;
-            color: white;
-            text-decoration: none;
+            gap: 8px;
+            padding: 10px 20px;
             border-radius: 14px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border-color);
+            color: #94a3b8;
+            font-size: 0.92rem;
             font-weight: 600;
-            transition: all 0.3s ease;
+            cursor: pointer;
+            transition: all 0.25s ease;
         }
 
-        .btn:hover {
-            background: #1e293b;
+        .filter-tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .bg-blobs {
-            position: fixed;
+        .filter-tab.active {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+        }
+
+        .filter-tab .badge-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Main Content Container */
+        .main-container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        /* Video Cards Grid */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .video-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .video-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Video Thumbnail Container */
+        .card-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background: #090d16;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .card-thumbnail img {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
-            overflow: hidden;
+            object-fit: cover;
+            transition: transform 0.4s ease;
         }
 
-        .blob {
+        .video-card:hover .card-thumbnail img {
+            transform: scale(1.06);
+        }
+
+        .play-overlay {
             position: absolute;
-            width: 500px;
-            height: 500px;
-            background: rgba(99, 102, 241, 0.1);
-            filter: blur(100px);
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .video-card:hover .play-overlay {
+            background: rgba(15, 23, 42, 0.2);
+        }
+
+        .play-btn-circle {
+            width: 60px;
+            height: 60px;
+            background: rgba(99, 102, 241, 0.9);
             border-radius: 50%;
-            animation: move 20s infinite alternate;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+            transition: all 0.3s ease;
+            padding-left: 4px;
         }
 
-        .blob:nth-child(2) {
-            background: rgba(139, 92, 246, 0.1);
-            right: -100px;
-            bottom: -100px;
-            animation-delay: -5s;
+        .video-card:hover .play-btn-circle {
+            transform: scale(1.15);
+            background: #ef4444;
+            box-shadow: 0 12px 30px rgba(239, 68, 68, 0.6);
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+        .lang-tag {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #a5b4fc;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 2;
         }
 
-        @keyframes move {
-            from { transform: translate(-10%, -10%); }
-            to { transform: translate(10%, 10%); }
+        /* Card Content */
+        .card-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
-        @media (max-width: 480px) {
-            .container { padding: 30px 20px; }
-            h1 { font-size: 26px; }
-            p { font-size: 16px; }
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: white;
+            margin: 0 0 10px;
+            line-height: 1.4;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+            margin: 0 0 20px;
+            flex: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 16px;
+            margin-top: auto;
+        }
+
+        .watch-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .watch-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: rgba(30, 41, 59, 0.4);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #6366f1;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .empty-state h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 0 10px;
+            color: white;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            margin: 0 0 24px;
+        }
+
+        /* Video Theater Modal */
+        .video-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(9, 13, 22, 0.92);
+            backdrop-filter: blur(20px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .video-modal-content {
+            width: 100%;
+            max-width: 960px;
+            background: #1e293b;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+            position: relative;
+            animation: modalPop 0.3s ease-out;
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-player-wrapper {
+            position: relative;
+            padding-top: 56.25%;
+            background: black;
+        }
+
+        .modal-player-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .modal-header-bar {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0f172a;
+        }
+
+        .modal-title-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+            margin: 0;
+        }
+
+        .close-modal-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal-btn:hover {
+            background: #ef4444;
+        }
+
+        @media (max-width: 640px) {
+            .hero-title { font-size: 1.8rem; }
+            .video-grid { grid-template-columns: 1fr; }
+            .video-nav-brand span { display: none; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-blobs">
-        <div class="blob"></div>
-        <div class="blob"></div>
-    </div>
 
-    <div class="container">
-        <div class="badge">Coming Soon</div>
-        <div class="icon-box">
-            <i class="fas fa-play-circle"></i>
-        </div>
-        <h1>Video Tutorials</h1>
-        <p>Arey 😄! Manam super quality video tutorials ni ready chestunnam. Chala fast ga update chestham, chill bro! 🔥</p>
-        <a href="/dashboard" class="btn">
-            <i class="fas fa-arrow-left"></i>
-            Go to Dashboard
+    <!-- Header Navigation -->
+    <header class="video-nav">
+        <a href="/" class="video-nav-brand">
+            <img src="/static/images/CodeNative.png" alt="Code Native">
+            <span>Code Native</span>
         </a>
+        <div class="video-nav-links">
+            <a href="/start-learning.html" class="video-nav-btn"><i class="fas fa-book-open"></i> Courses</a>
+            <a href="/compiler.html" class="video-nav-btn"><i class="fas fa-terminal"></i> Compiler</a>
+            <a href="/dashboard" class="video-nav-btn primary"><i class="fas fa-user-graduate"></i> Dashboard</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-banner">
+        <div class="hero-badge">
+            <i class="fas fa-play-circle"></i> Telugu Video Tutorials
+        </div>
+        <h1 class="hero-title">Learn Coding with <span>Telugu Video Classes</span></h1>
+        <p class="hero-subtitle">Comprehensive, step-by-step video tutorials in Telugu for Python, Java, C, JavaScript, and Web Development with live coding demonstrations.</p>
+    </section>
+
+    <!-- Language Filter Tabs -->
+    <div class="filter-container">
+        <button class="filter-tab active" data-lang="all" onclick="selectLangTab('all')">
+            <i class="fas fa-layer-group"></i> All Videos <span class="badge-count" id="count-all">0</span>
+        </button>
+        <button class="filter-tab" data-lang="python" onclick="selectLangTab('python')">
+            <i class="fab fa-python" style="color:#38bdf8;"></i> Python <span class="badge-count" id="count-python">0</span>
+        </button>
+        <button class="filter-tab" data-lang="java" onclick="selectLangTab('java')">
+            <i class="fab fa-java" style="color:#f97316;"></i> Java <span class="badge-count" id="count-java">0</span>
+        </button>
+        <button class="filter-tab" data-lang="c" onclick="selectLangTab('c')">
+            <i class="fas fa-code" style="color:#a855f7;"></i> C Language <span class="badge-count" id="count-c">0</span>
+        </button>
+        <button class="filter-tab" data-lang="js" onclick="selectLangTab('js')">
+            <i class="fab fa-js-square" style="color:#eab308;"></i> JavaScript <span class="badge-count" id="count-js">0</span>
+        </button>
+        <button class="filter-tab" data-lang="web" onclick="selectLangTab('web')">
+            <i class="fab fa-html5" style="color:#ef4444;"></i> Web Dev <span class="badge-count" id="count-web">0</span>
+        </button>
     </div>
 
-    <script src="/static/chatbot.js" defer></script>
+    <!-- Videos Main Grid Container -->
+    <main class="main-container">
+        <div id="videoGrid" class="video-grid">
+            <!-- Dynamic Video Cards will be rendered here -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fas fa-video-slash"></i>
+            <h3>No Videos Found</h3>
+            <p>No video tutorials have been added for this category yet. We are actively uploading new Telugu video tutorials!</p>
+            <a href="/dashboard" class="video-nav-btn primary">Go to Dashboard</a>
+        </div>
+    </main>
+
+    <!-- Video Theater Modal -->
+    <div id="videoModal" class="video-modal">
+        <div class="video-modal-content">
+            <div class="modal-header-bar">
+                <h3 id="modalVideoTitle" class="modal-title-text">Video Tutorial</h3>
+                <button class="close-modal-btn" onclick="closeVideoModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-player-wrapper">
+                <iframe id="modalIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allVideos = [];
+
+        async function fetchVideos() {
+            try {
+                const res = await fetch('/api/videos');
+                const data = await res.json();
+                if (data.status === 'success' && Array.isArray(data.videos)) {
+                    allVideos = data.videos;
+                    updateCounts();
+                    
+                    // Check URL parameter e.g. /videos.html?lang=python
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const langParam = urlParams.get('lang') || 'all';
+                    selectLangTab(langParam.toLowerCase());
+                } else {
+                    renderGrid([]);
+                }
+            } catch (err) {
+                console.error('Failed to load videos:', err);
+                renderGrid([]);
+            }
+        }
+
+        function updateCounts() {
+            const counts = { all: allVideos.length, python: 0, java: 0, c: 0, js: 0, web: 0 };
+            allVideos.forEach(v => {
+                const lang = (v.language || '').toLowerCase();
+                if (counts[lang] !== undefined) {
+                    counts[lang]++;
+                }
+            });
+            for (const key in counts) {
+                const badge = document.getElementById(`count-${key}`);
+                if (badge) badge.innerText = counts[key];
+            }
+        }
+
+        function selectLangTab(lang) {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            const activeTab = document.querySelector(`.filter-tab[data-lang="${lang}"]`);
+            if (activeTab) activeTab.classList.add('active');
+
+            let filtered = allVideos;
+            if (lang !== 'all') {
+                filtered = allVideos.filter(v => (v.language || '').toLowerCase() === lang);
+            }
+            renderGrid(filtered);
+        }
+
+        function renderGrid(videos) {
+            const grid = document.getElementById('videoGrid');
+            const empty = document.getElementById('emptyState');
+            grid.innerHTML = '';
+
+            if (!videos || videos.length === 0) {
+                grid.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            empty.style.display = 'none';
+
+            videos.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                
+                const thumbUrl = v.thumbnail_url || (v.youtube_id ? `https://img.youtube.com/vi/${v.youtube_id}/mqdefault.jpg` : '');
+                const embedUrl = v.embed_url || v.youtube_url;
+
+                card.innerHTML = `
+                    <div class="card-thumbnail" onclick="openVideoModal('${v.title.replace(/'/g, "\\'")}', '${embedUrl}')">
+                        <span class="lang-tag">${v.language}</span>
+                        ${thumbUrl ? `<img src="${thumbUrl}" alt="${v.title}">` : ''}
+                        <div class="play-overlay">
+                            <div class="play-btn-circle">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">${v.title}</h3>
+                        <p class="card-desc">${v.description || 'Watch step-by-step video lesson in Telugu.'}</p>
+                        <div class="card-footer">
+                            <button class="watch-btn" onclick="openVideoModal('${v.title.replace(/'/g, "\\'")}', '${embedUrl}')">
+                                <i class="fas fa-play-circle"></i> Watch Video
+                            </button>
+                            <a href="${v.youtube_url}" target="_blank" style="color:var(--text-dim); font-size:0.8rem; text-decoration:none;" title="Open in YouTube">
+                                <i class="fab fa-youtube" style="color:#ef4444;"></i> YouTube
+                            </a>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openVideoModal(title, embedUrl) {
+            document.getElementById('modalVideoTitle').innerText = title;
+            // Add autoplay to embedUrl
+            const autoEmbed = embedUrl.includes('?') ? `${embedUrl}&autoplay=1` : `${embedUrl}?autoplay=1`;
+            document.getElementById('modalIframe').src = autoEmbed;
+            const modal = document.getElementById('videoModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            modal.style.display = 'none';
+            document.getElementById('modalIframe').src = '';
+        }
+
+        // Close modal on click outside
+        window.onclick = function(e) {
+            const modal = document.getElementById('videoModal');
+            if (e.target === modal) {
+                closeVideoModal();
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', fetchVideos);
+    </script>
 </body>
 </html>

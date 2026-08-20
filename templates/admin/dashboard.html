@@ -31,6 +31,7 @@
             <li class="active" data-tab="tab-dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></li>
             <li data-tab="tab-analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></li>
             <li data-tab="tab-tutorials"><i class="fas fa-book"></i><span>Tutorials</span></li>
+            <li data-tab="tab-videos"><i class="fas fa-video"></i><span>Upload Videos</span></li>
             <li data-tab="tab-careers"><i class="fas fa-briefcase"></i><span>Careers</span></li>
             <li data-tab="tab-users"><i class="fas fa-users"></i><span>Users</span></li>
             <li data-tab="tab-online-classes"><i class="fas fa-chalkboard-teacher"></i><span>Online Classes</span></li>
@@ -1020,6 +1021,106 @@
             </div>
         </div>
 
+        <!-- VIDEOS TAB -->
+        <div id="tab-videos" class="tab-pane">
+            <div class="section-card">
+                <div class="section-header">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="lang-badge-header" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;"><i class="fas fa-play"></i></div>
+                        <div>
+                            <h2 style="margin:0;">Video Tutorials Management</h2>
+                            <p style="margin:0; font-size:0.8rem; color:var(--admin-text-dim);">Upload and manage language-specific YouTube videos</p>
+                        </div>
+                    </div>
+                    <button class="btn-action btn-primary" onclick="openAddVideoModal()">
+                        <i class="fas fa-plus"></i> Upload / Add Video
+                    </button>
+                </div>
+
+                <!-- Language Filter Tabs for Videos -->
+                <div class="lang-tabs-container" style="margin-bottom: 20px;">
+                    <button class="lang-tab-btn active" data-video-lang="all" onclick="filterAdminVideos('all')">
+                        <i class="fas fa-layer-group"></i> All Languages
+                    </button>
+                    <button class="lang-tab-btn" data-video-lang="python" onclick="filterAdminVideos('python')">
+                        <span class="lang-tab-icon lang-icon-python">Py</span> Python
+                    </button>
+                    <button class="lang-tab-btn" data-video-lang="java" onclick="filterAdminVideos('java')">
+                        <span class="lang-tab-icon lang-icon-java">J</span> Java
+                    </button>
+                    <button class="lang-tab-btn" data-video-lang="c" onclick="filterAdminVideos('c')">
+                        <span class="lang-tab-icon lang-icon-c">C</span> C Language
+                    </button>
+                    <button class="lang-tab-btn" data-video-lang="js" onclick="filterAdminVideos('js')">
+                        <span class="lang-tab-icon lang-icon-js"><i class="fab fa-js"></i></span> JavaScript
+                    </button>
+                    <button class="lang-tab-btn" data-video-lang="web" onclick="filterAdminVideos('web')">
+                        <span class="lang-tab-icon lang-icon-web"><i class="fab fa-html5"></i></span> Web Dev
+                    </button>
+                    <button class="lang-tab-btn" data-video-lang="other" onclick="filterAdminVideos('other')">
+                        <i class="fas fa-globe"></i> Other
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Video</th>
+                                <th>Language</th>
+                                <th>Title</th>
+                                <th>YouTube Link</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="videos-tbody">
+                            {% for v in videos %}
+                            <tr class="video-row" data-lang="{{ v.language }}">
+                                <td style="color:var(--admin-text-dim);font-size:0.85rem;">{{ loop.index }}</td>
+                                <td>
+                                    {% if v.thumbnail_url %}
+                                    <div style="position:relative; width:90px; height:50px; border-radius:8px; overflow:hidden; border:1px solid var(--admin-border);">
+                                        <img src="{{ v.thumbnail_url }}" style="width:100%; height:100%; object-fit:cover;" alt="">
+                                        <a href="{{ v.embed_url }}" target="_blank" style="position:absolute; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;" title="Preview Video"><i class="fas fa-play-circle"></i></a>
+                                    </div>
+                                    {% else %}
+                                    <div style="width:90px; height:50px; border-radius:8px; background:rgba(99,102,241,0.1); display:flex; align-items:center; justify-content:center; color:var(--admin-primary);"><i class="fas fa-video"></i></div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge" style="background:rgba(99,102,241,0.15); color:#a5b4fc; text-transform:uppercase; font-weight:700;">{{ v.language }}</span>
+                                </td>
+                                <td>
+                                    <div style="font-weight:600; color:var(--admin-text-main);">{{ v.title }}</div>
+                                    {% if v.description %}
+                                    <div style="font-size:0.78rem; color:var(--admin-text-dim); max-width:250px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">{{ v.description }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ v.youtube_url }}" target="_blank" style="font-size:0.8rem; color:#60a5fa; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                                        <i class="fab fa-youtube" style="color:#ef4444;"></i> Watch Link <i class="fas fa-external-link-alt" style="font-size:0.65rem;"></i>
+                                    </a>
+                                </td>
+                                <td><span class="order-badge">{{ v.order_index }}</span></td>
+                                <td>
+                                    <div style="display:flex; gap:0.5rem;">
+                                        <button class="btn-action btn-sm btn-edit" onclick='editVideo({{ v|tojson }})' title="Edit"><i class="fas fa-pen"></i></button>
+                                        <button class="btn-action btn-sm btn-delete" onclick="deleteVideo({{ v.id }})" title="Delete"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not videos %}
+                            <tr id="no-videos-row"><td colspan="7" class="empty-row"><i class="fas fa-video" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No videos uploaded yet. Click "Upload / Add Video" to add your first YouTube video!</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Add/Edit Modal -->
@@ -1361,6 +1462,51 @@
                         <textarea id="reply_doubt_text" class="form-control" style="height: 140px; resize: vertical;" placeholder="Type your reply here..." required></textarea>
                     </div>
                     <button type="submit" class="btn-action btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-reply"></i> Submit Reply</button>
+    <!-- Video Add/Edit Modal -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h2 id="videoModalTitle">Upload / Add YouTube Video</h2>
+                <span class="close-modal" onclick="closeVideoModal()"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="modal-body">
+                <form id="videoForm" onsubmit="submitVideoForm(event)">
+                    <input type="hidden" id="video_id">
+                    <div class="form-group">
+                        <label>Programming Language <span style="color:#ef4444;">*</span></label>
+                        <select id="video_language" class="form-control" required>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="c">C Language</option>
+                            <option value="js">JavaScript</option>
+                            <option value="web">Web Development (HTML/CSS)</option>
+                            <option value="other">Other / General</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Video Title <span style="color:#ef4444;">*</span></label>
+                        <input type="text" id="video_title" class="form-control" placeholder="e.g. Python Full Course in Telugu - Part 1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>YouTube Link or Video ID <span style="color:#ef4444;">*</span></label>
+                        <input type="text" id="video_youtube_url" class="form-control" placeholder="e.g. https://www.youtube.com/watch?v=... or https://youtu.be/..." required>
+                        <small style="color:var(--admin-text-dim); font-size:0.75rem; display:block; margin-top:4px;">Paste any YouTube link, watch URL, or embed link.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Description / Overview (Optional)</label>
+                        <textarea id="video_description" class="form-control" style="height: 80px;" placeholder="Brief explanation of what this video covers..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Topic Slug (Optional)</label>
+                        <input type="text" id="video_topic_slug" class="form-control" placeholder="e.g. python-basics">
+                    </div>
+                    <div class="form-group">
+                        <label>Display Order Index</label>
+                        <input type="number" id="video_order_index" class="form-control" value="0" required>
+                    </div>
+                    <button type="submit" class="btn-action btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-save"></i> Save Video
+                    </button>
                 </form>
             </div>
         </div>
@@ -1410,6 +1556,7 @@
                     mainTitle.innerText = btn.querySelector('span') ? btn.querySelector('span').innerText : btn.innerText.trim();
                     if (tabId === 'tab-dashboard') mainTitle.innerText += ' Overview';
                     else if (tabId === 'tab-tutorials') mainTitle.innerText = 'Tutorial Management';
+                    else if (tabId === 'tab-videos') mainTitle.innerText = 'Upload & Manage Videos';
                     else if (tabId === 'tab-careers') mainTitle.innerText = 'Careers Management';
                     else if (tabId === 'tab-online-classes') mainTitle.innerText = 'Online Classes Management';
                     else if (tabId === 'tab-doubts') mainTitle.innerText = 'Doubts & Support Management';
@@ -1427,6 +1574,115 @@
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
         });
+
+        // ── Video Management Functions ──
+        function openAddVideoModal(lang = 'python') {
+            document.getElementById('videoModalTitle').innerText = 'Upload / Add YouTube Video';
+            document.getElementById('video_id').value = '';
+            document.getElementById('video_language').value = lang;
+            document.getElementById('video_title').value = '';
+            document.getElementById('video_youtube_url').value = '';
+            document.getElementById('video_description').value = '';
+            document.getElementById('video_topic_slug').value = '';
+            document.getElementById('video_order_index').value = '0';
+            const modal = document.getElementById('videoModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function editVideo(v) {
+            document.getElementById('videoModalTitle').innerText = 'Edit Video Entry';
+            document.getElementById('video_id').value = v.id;
+            document.getElementById('video_language').value = v.language;
+            document.getElementById('video_title').value = v.title;
+            document.getElementById('video_youtube_url').value = v.youtube_url;
+            document.getElementById('video_description').value = v.description || '';
+            document.getElementById('video_topic_slug').value = v.topic_slug || '';
+            document.getElementById('video_order_index').value = v.order_index || 0;
+            const modal = document.getElementById('videoModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        async function submitVideoForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('video_id').value;
+            const payload = {
+                language: document.getElementById('video_language').value,
+                title: document.getElementById('video_title').value,
+                youtube_url: document.getElementById('video_youtube_url').value,
+                description: document.getElementById('video_description').value,
+                topic_slug: document.getElementById('video_topic_slug').value,
+                order_index: parseInt(document.getElementById('video_order_index').value) || 0
+            };
+
+            const url = id ? `/api/admin/videos/${id}` : '/api/admin/videos';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('✅ ' + (data.message || 'Saved successfully!'));
+                    location.reload();
+                } else {
+                    alert('❌ ' + (data.message || 'Failed to save video.'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred while saving the video.');
+            }
+        }
+
+        async function deleteVideo(id) {
+            if (!confirm('Are you sure you want to delete this video?')) return;
+            try {
+                const res = await fetch(`/api/admin/videos/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('✅ ' + data.message);
+                    location.reload();
+                } else {
+                    alert('❌ ' + data.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to delete video.');
+            }
+        }
+
+        function filterAdminVideos(lang) {
+            const btns = document.querySelectorAll('#tab-videos .lang-tab-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            const activeBtn = document.querySelector(`#tab-videos .lang-tab-btn[data-video-lang="${lang}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const rows = document.querySelectorAll('.video-row');
+            let visibleCount = 0;
+            rows.forEach(r => {
+                const rLang = r.getAttribute('data-lang');
+                if (lang === 'all' || rLang === lang) {
+                    r.style.display = '';
+                    visibleCount++;
+                } else {
+                    r.style.display = 'none';
+                }
+            });
+            const emptyRow = document.getElementById('no-videos-row');
+            if (emptyRow) {
+                emptyRow.style.display = visibleCount === 0 ? '' : 'none';
+            }
+        }
 
         const modal = document.getElementById('contentModal');
         const closeModalBtn = document.getElementById('closeModal');

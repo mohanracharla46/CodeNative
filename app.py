@@ -85,21 +85,44 @@ async def add_security_headers(request: Request, call_next):
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdnjs.cloudflare.com https://accounts.google.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
-        "img-src 'self' data: https: https://ui-avatars.com https://www.google-analytics.com https://www.googletagmanager.com; "
+        "img-src 'self' data: https: https://ui-avatars.com https://img.youtube.com https://i.ytimg.com https://www.google-analytics.com https://www.googletagmanager.com; "
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
         "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://www.googleapis.com; "
-        "frame-src 'self' https://accounts.google.com; "
+        "frame-src 'self' https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com; "
         "object-src 'none'; "
         "base-uri 'self'; "
         "form-action 'self'; "
         "frame-ancestors 'none';"
     )
     response.headers["Content-Security-Policy"] = csp_policy
-    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
     return response
+
+
+def extract_youtube_id(url: str) -> str:
+    """Extract YouTube Video ID from various URL formats."""
+    if not url:
+        return ""
+    url = url.strip()
+    import re
+    patterns = [
+        r'(?:v=|\/embed\/|\/v\/|youtu\.be\/|\/shorts\/)([a-zA-Z0-9_-]{11})',
+        r'^([a-zA-Z0-9_-]{11})$'
+    ]
+    for p in patterns:
+        m = re.search(p, url)
+        if m:
+            return m.group(1)
+    return url
+
+
+def format_youtube_embed(url: str) -> str:
+    """Convert standard YouTube URL to YouTube embed URL."""
+    vid = extract_youtube_id(url)
+    return f"https://www.youtube.com/embed/{vid}" if vid else url
 
 # Add Gzip compression middleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -2569,24 +2592,16 @@ async def admin_dashboard(request: Request):
             ORDER BY d.created_at DESC
         """).fetchall()
         
-        pending_doubts_count_res = execute_query(conn2, "SELECT COUNT(*) as count FROM doubts WHERE status = 'Pending'").fetchone()
-        pending_doubts_count = pending_doubts_count_res['count'] if pending_doubts_count_res else 0
-        
-        processed_subs = []
-        for s in submissions_list:
-            sd = dict(s)
-            sd['approved'] = (s['user_id'], s['task_id']) in approved_set
-            
-            sd['score_display'] = '—'
-            if s['task_type'] == 'exam' and s['submission_data']:
-                try:
-                    import json
-                    parsed = json.loads(s['submission_data'])
-                    sd['score_display'] = f"{parsed.get('score', 0)} / {parsed.get('total', 0)}"
-                except Exception:
-                    pass
-            processed_subs.append(sd)
-            
+        # Fetch videos list
+        videos_list = execute_query(conn2, "SELECT * FROM videos ORDER BY language ASC, order_index ASC, id DESC").fetchall()
+        processed_videos = []
+        for v in videos_list:
+            vd = dict(v)
+            vd['youtube_id'] = extract_youtube_id(vd.get('youtube_url', ''))
+            vd['embed_url'] = format_youtube_embed(vd.get('youtube_url', ''))
+            vd['thumbnail_url'] = f"https://img.youtube.com/vi/{vd['youtube_id']}/mqdefault.jpg" if vd['youtube_id'] else ""
+            processed_videos.append(vd)
+
         release_db_connection(conn2)
         return _render(request, "admin/dashboard.html", dict(
             contents=_jsonify_dates([dict(c) for c in contents]),
@@ -2600,11 +2615,131 @@ async def admin_dashboard(request: Request):
             tasks=_jsonify_dates([dict(t) for t in tasks_list]),
             submissions=_jsonify_dates(processed_subs),
             doubts=_jsonify_dates([dict(d) for d in doubts_list]),
-            pending_doubts_count=pending_doubts_count
+            pending_doubts_count=pending_doubts_count,
+            videos=_jsonify_dates(processed_videos)
         ))
     except Exception as e:
         import traceback
         return HTMLResponse(f"<pre>Error in admin_dashboard:\n{traceback.format_exc()}</pre>", status_code=500)
+
+
+# ─── Videos API Endpoints ───────────────────────────────────────────────────
+
+@app.get("/api/videos")
+async def get_videos(request: Request, lang: Optional[str] = None):
+    """Public endpoint to fetch all videos or videos filtered by language."""
+    conn = get_db_connection()
+    try:
+        if lang:
+            rows = execute_query(conn, "SELECT * FROM videos WHERE LOWER(language) = LOWER(?) ORDER BY order_index ASC, id DESC", (lang,)).fetchall()
+        else:
+            rows = execute_query(conn, "SELECT * FROM videos ORDER BY language ASC, order_index ASC, id DESC").fetchall()
+        
+        result = []
+        for r in rows:
+            vd = dict(r)
+            vd['youtube_id'] = extract_youtube_id(vd.get('youtube_url', ''))
+            vd['embed_url'] = format_youtube_embed(vd.get('youtube_url', ''))
+            vd['thumbnail_url'] = f"https://img.youtube.com/vi/{vd['youtube_id']}/mqdefault.jpg" if vd['youtube_id'] else ""
+            result.append(vd)
+        return JSONResponse({"status": "success", "videos": result})
+    except Exception as e:
+        return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+    finally:
+        release_db_connection(conn)
+
+
+@app.get("/api/videos/{language}")
+async def get_videos_by_language(language: str, request: Request):
+    """Public endpoint to fetch videos for a specific programming language."""
+    return await get_videos(request, lang=language)
+
+
+@app.post("/api/admin/videos")
+async def admin_add_video(request: Request):
+    """Admin endpoint to add a new YouTube video entry for a language."""
+    if not _admin_check(request):
+        return JSONResponse({"message": "Admin access required."}, status_code=403)
+    try:
+        data = await request.json()
+        language = (data.get('language') or '').strip().lower()
+        title = (data.get('title') or '').strip()
+        raw_url = (data.get('youtube_url') or '').strip()
+        description = (data.get('description') or '').strip()
+        topic_slug = (data.get('topic_slug') or '').strip()
+        order_index = int(data.get('order_index') or 0)
+
+        if not language or not title or not raw_url:
+            return JSONResponse({"message": "Language, Title, and YouTube Link are required."}, status_code=400)
+
+        embed_url = format_youtube_embed(raw_url)
+        conn = get_db_connection()
+        is_pg = hasattr(conn, 'cursor_factory')
+
+        if is_pg:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO videos (language, title, youtube_url, description, topic_slug, order_index)
+                VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
+            """, (language, title, embed_url, description, topic_slug, order_index))
+            new_id = cursor.fetchone()['id']
+        else:
+            cursor = conn.execute("""
+                INSERT INTO videos (language, title, youtube_url, description, topic_slug, order_index)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (language, title, embed_url, description, topic_slug, order_index))
+            new_id = cursor.lastrowid
+        
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Video added successfully!", "video_id": new_id}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.put("/api/admin/videos/{video_id}")
+async def admin_update_video(video_id: int, request: Request):
+    """Admin endpoint to update an existing video."""
+    if not _admin_check(request):
+        return JSONResponse({"message": "Admin access required."}, status_code=403)
+    try:
+        data = await request.json()
+        language = (data.get('language') or '').strip().lower()
+        title = (data.get('title') or '').strip()
+        raw_url = (data.get('youtube_url') or '').strip()
+        description = (data.get('description') or '').strip()
+        topic_slug = (data.get('topic_slug') or '').strip()
+        order_index = int(data.get('order_index') or 0)
+
+        if not language or not title or not raw_url:
+            return JSONResponse({"message": "Language, Title, and YouTube Link are required."}, status_code=400)
+
+        embed_url = format_youtube_embed(raw_url)
+        conn = get_db_connection()
+        execute_query(conn, """
+            UPDATE videos SET language=?, title=?, youtube_url=?, description=?, topic_slug=?, order_index=?
+            WHERE id=?
+        """, (language, title, embed_url, description, topic_slug, order_index, video_id))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Video updated successfully!"}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.delete("/api/admin/videos/{video_id}")
+async def admin_delete_video(video_id: int, request: Request):
+    """Admin endpoint to delete a video."""
+    if not _admin_check(request):
+        return JSONResponse({"message": "Admin access required."}, status_code=403)
+    try:
+        conn = get_db_connection()
+        execute_query(conn, "DELETE FROM videos WHERE id = ?", (video_id,))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Video deleted successfully!"}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
 
 
 @app.post("/admin/tasks/add")
