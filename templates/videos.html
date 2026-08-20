@@ -123,7 +123,7 @@
 
         /* Hero Banner */
         .hero-banner {
-            padding: 45px 24px 30px;
+            padding: 40px 24px 20px;
             text-align: center;
             max-width: 900px;
             margin: 0 auto;
@@ -143,10 +143,15 @@
             letter-spacing: 0.05em;
             text-transform: uppercase;
             margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+        .hero-badge:hover {
+            background: rgba(99, 102, 241, 0.15);
         }
 
         .hero-title {
-            font-size: 2.4rem;
+            font-size: 2.3rem;
             font-weight: 800;
             color: #0f172a;
             margin: 0 0 16px;
@@ -163,70 +168,16 @@
         .hero-subtitle {
             font-size: 1.05rem;
             color: var(--text-dim);
-            margin: 0 auto 30px;
+            margin: 0 auto 20px;
             max-width: 680px;
             line-height: 1.6;
-        }
-
-        /* Language Filter Tabs */
-        .filter-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-            padding: 0 20px;
-        }
-
-        .filter-tab {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 22px;
-            border-radius: 100px;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            color: #475569;
-            font-size: 0.92rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-        }
-
-        .filter-tab:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-            transform: translateY(-2px);
-        }
-
-        .filter-tab.active {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-        }
-
-        .filter-tab .badge-count {
-            background: #f1f5f9;
-            color: #64748b;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .filter-tab.active .badge-count {
-            background: rgba(255, 255, 255, 0.25);
-            color: white;
         }
 
         /* Main Content Container */
         .main-container {
             max-width: 1240px;
             margin: 0 auto;
-            padding: 0 24px 80px;
+            padding: 10px 24px 80px;
         }
 
         /* Video Cards Grid */
@@ -394,7 +345,7 @@
             border: 2px dashed #cbd5e1;
             border-radius: 24px;
             max-width: 600px;
-            margin: 40px auto;
+            margin: 30px auto;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
         }
 
@@ -524,34 +475,12 @@
 
     <!-- Hero Section -->
     <section class="hero-banner">
-        <div class="hero-badge">
-            <i class="fas fa-play-circle"></i> Telugu Video Tutorials
-        </div>
+        <a href="/start-learning.html" class="hero-badge" id="heroBadge">
+            <i class="fas fa-arrow-left"></i> Back to Courses
+        </a>
         <h1 class="hero-title" id="heroTitle">Learn Coding with <span id="heroSpan">Telugu Video Classes</span></h1>
-        <p class="hero-subtitle" id="heroSubtitle">Comprehensive, step-by-step video tutorials in Telugu for Python, Java, C, JavaScript, and Web Development with live coding demonstrations.</p>
+        <p class="hero-subtitle" id="heroSubtitle">Comprehensive, step-by-step video tutorials in Telugu with live coding demonstrations.</p>
     </section>
-
-    <!-- Language Filter Tabs -->
-    <div class="filter-container">
-        <button class="filter-tab active" data-lang="all" onclick="selectLangTab('all')">
-            <i class="fas fa-layer-group"></i> All Videos <span class="badge-count" id="count-all">0</span>
-        </button>
-        <button class="filter-tab" data-lang="python" onclick="selectLangTab('python')">
-            <i class="fab fa-python" style="color:#0284c7;"></i> Python <span class="badge-count" id="count-python">0</span>
-        </button>
-        <button class="filter-tab" data-lang="java" onclick="selectLangTab('java')">
-            <i class="fab fa-java" style="color:#ea580c;"></i> Java <span class="badge-count" id="count-java">0</span>
-        </button>
-        <button class="filter-tab" data-lang="c" onclick="selectLangTab('c')">
-            <i class="fas fa-code" style="color:#9333ea;"></i> C Language <span class="badge-count" id="count-c">0</span>
-        </button>
-        <button class="filter-tab" data-lang="js" onclick="selectLangTab('js')">
-            <i class="fab fa-js-square" style="color:#ca8a04;"></i> JavaScript <span class="badge-count" id="count-js">0</span>
-        </button>
-        <button class="filter-tab" data-lang="web" onclick="selectLangTab('web')">
-            <i class="fab fa-html5" style="color:#dc2626;"></i> Web Dev <span class="badge-count" id="count-web">0</span>
-        </button>
-    </div>
 
     <!-- Videos Main Grid Container -->
     <main class="main-container">
@@ -564,7 +493,7 @@
             <h3 id="emptyTitle">No Videos Found</h3>
             <p id="emptyDesc">No video tutorials have been uploaded for this category yet. We are actively uploading new Telugu video tutorials!</p>
             <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-                <button onclick="selectLangTab('all')" class="video-nav-btn primary">View All Videos</button>
+                <a href="/start-learning.html" class="video-nav-btn primary">Explore Courses</a>
                 <a href="/dashboard" class="video-nav-btn">Go to Dashboard</a>
             </div>
         </div>
@@ -588,12 +517,12 @@
         let currentLang = 'all';
 
         const langTitles = {
-            all: { title: "Learn Coding with ", span: "Telugu Video Classes", desc: "Comprehensive, step-by-step video tutorials in Telugu for Python, Java, C, JavaScript, and Web Development." },
-            c: { title: "Master C Language with ", span: "Telugu Video Tutorials", desc: "Step-by-step C programming video lessons in Telugu covering pointers, structures, memory allocation, and algorithms." },
-            python: { title: "Learn Python Programming with ", span: "Telugu Video Tutorials", desc: "Step-by-step Python video lessons in Telugu covering syntax, data structures, OOPs, modules, and practice problems." },
-            java: { title: "Master Java Programming with ", span: "Telugu Video Tutorials", desc: "Complete Java video tutorials in Telugu covering object-oriented concepts, exception handling, and enterprise logic." },
-            js: { title: "Learn JavaScript with ", span: "Telugu Video Tutorials", desc: "Interactive JavaScript video tutorials in Telugu covering ES6, DOM manipulation, async programming, and web logic." },
-            web: { title: "Learn Web Development with ", span: "Telugu Video Tutorials", desc: "Build responsive websites with step-by-step HTML & CSS video tutorials in Telugu." }
+            all: { title: "Learn Coding with ", span: "Telugu Video Classes", desc: "Comprehensive, step-by-step video tutorials in Telugu for Python, Java, C, JavaScript, and Web Development.", badge: "<i class='fas fa-play-circle'></i> Telugu Video Tutorials" },
+            c: { title: "Master C Language with ", span: "Telugu Video Tutorials", desc: "Step-by-step C programming video lessons in Telugu covering pointers, structures, memory allocation, and algorithms.", badge: "<i class='fas fa-code'></i> C Programming Videos" },
+            python: { title: "Learn Python Programming with ", span: "Telugu Video Tutorials", desc: "Step-by-step Python video lessons in Telugu covering syntax, data structures, OOPs, modules, and practice problems.", badge: "<i class='fab fa-python'></i> Python Videos" },
+            java: { title: "Master Java Programming with ", span: "Telugu Video Tutorials", desc: "Complete Java video tutorials in Telugu covering object-oriented concepts, exception handling, and enterprise logic.", badge: "<i class='fab fa-java'></i> Java Videos" },
+            js: { title: "Learn JavaScript with ", span: "Telugu Video Tutorials", desc: "Interactive JavaScript video tutorials in Telugu covering ES6, DOM manipulation, async programming, and web logic.", badge: "<i class='fab fa-js-square'></i> JavaScript Videos" },
+            web: { title: "Learn Web Development with ", span: "Telugu Video Tutorials", desc: "Build responsive websites with step-by-step HTML & CSS video tutorials in Telugu.", badge: "<i class='fab fa-html5'></i> Web Dev Videos" }
         };
 
         async function fetchVideos() {
@@ -602,12 +531,11 @@
                 const data = await res.json();
                 if (data.status === 'success' && Array.isArray(data.videos)) {
                     allVideos = data.videos;
-                    updateCounts();
                     
                     // Check URL parameter e.g. /videos.html?lang=c
                     const urlParams = new URLSearchParams(window.location.search);
                     const langParam = (urlParams.get('lang') || 'all').toLowerCase();
-                    selectLangTab(langParam);
+                    setLanguage(langParam);
                 } else {
                     renderGrid([]);
                 }
@@ -617,31 +545,15 @@
             }
         }
 
-        function updateCounts() {
-            const counts = { all: allVideos.length, python: 0, java: 0, c: 0, js: 0, web: 0 };
-            allVideos.forEach(v => {
-                const lang = (v.language || '').toLowerCase();
-                if (counts[lang] !== undefined) {
-                    counts[lang]++;
-                }
-            });
-            for (const key in counts) {
-                const badge = document.getElementById(`count-${key}`);
-                if (badge) badge.innerText = counts[key];
-            }
-        }
-
-        function selectLangTab(lang) {
+        function setLanguage(lang) {
             currentLang = lang;
-            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-            const activeTab = document.querySelector(`.filter-tab[data-lang="${lang}"]`);
-            if (activeTab) activeTab.classList.add('active');
 
-            // Update Dynamic Hero Header Text
+            // Update Hero Header Text and Badge
             const info = langTitles[lang] || langTitles.all;
             document.getElementById('heroTitle').childNodes[0].nodeValue = info.title;
             document.getElementById('heroSpan').innerText = info.span;
             document.getElementById('heroSubtitle').innerText = info.desc;
+            document.getElementById('heroBadge').innerHTML = info.badge;
 
             // Filter videos strictly by selected language
             let filtered = allVideos;
