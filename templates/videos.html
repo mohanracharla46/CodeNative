@@ -53,77 +53,9 @@
             min-height: 100vh;
         }
 
-        /* Top Header / Navigation (Homepage Light Style) */
-        .video-nav {
-            background: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: 14px 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-        }
-
-        .video-nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: #0f172a;
-            font-weight: 800;
-            font-size: 1.25rem;
-        }
-
-        .video-nav-brand img {
-            height: 36px;
-        }
-
-        .video-nav-links {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .video-nav-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 12px;
-            background: #ffffff;
-            color: #475569;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-        }
-
-        .video-nav-btn:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-            transform: translateY(-1px);
-        }
-
-        .video-nav-btn.primary {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
-        }
-
-        .video-nav-btn.primary:hover {
-            background: linear-gradient(135deg, #4f46e5, #4338ca);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
-        }
-
         /* Hero Banner */
         .hero-banner {
-            padding: 40px 24px 20px;
+            padding: 50px 24px 25px;
             text-align: center;
             max-width: 900px;
             margin: 0 auto;
@@ -151,7 +83,7 @@
         }
 
         .hero-title {
-            font-size: 2.3rem;
+            font-size: 2.4rem;
             font-weight: 800;
             color: #0f172a;
             margin: 0 0 16px;
@@ -454,22 +386,30 @@
         @media (max-width: 640px) {
             .hero-title { font-size: 1.8rem; }
             .video-grid { grid-template-columns: 1fr; }
-            .video-nav-brand span { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation (Homepage Style) -->
-    <header class="video-nav">
-        <a href="/" class="video-nav-brand">
-            <img src="/static/images/CodeNative.png" alt="Code Native">
-            <span>Code Native</span>
-        </a>
-        <div class="video-nav-links">
-            <a href="/start-learning.html" class="video-nav-btn"><i class="fas fa-book-open"></i> Courses</a>
-            <a href="/compiler.html" class="video-nav-btn"><i class="fas fa-terminal"></i> Compiler</a>
-            <a href="/dashboard" class="video-nav-btn primary"><i class="fas fa-user-graduate"></i> Dashboard</a>
+    <!-- Header Navigation (Exact Homepage Header) -->
+    <header class="header">
+        <div class="container header-inner">
+            <a href="/" class="logo"><img src="{{ url_for('static', filename='images/CodeNative.png') }}"
+                    alt="Code Native" width="70" height="48"></a>
+
+            <div class="header-actions" id="headerActions">
+                {% if session.get('is_admin') %}
+                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock"
+                        style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
+                {% endif %}
+
+                {% if session.get('user_name') %}
+                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle"
+                        style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
+                {% else %}
+                <a href="/signin.html" class="btn-signup">Sign in</a>
+                {% endif %}
+            </div>
         </div>
     </header>
 
@@ -493,8 +433,8 @@
             <h3 id="emptyTitle">No Videos Found</h3>
             <p id="emptyDesc">No video tutorials have been uploaded for this category yet. We are actively uploading new Telugu video tutorials!</p>
             <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-                <a href="/start-learning.html" class="video-nav-btn primary">Explore Courses</a>
-                <a href="/dashboard" class="video-nav-btn">Go to Dashboard</a>
+                <a href="/start-learning.html" class="btn-signup">Explore Courses</a>
+                <a href="/dashboard" class="btn-signup btn-admin">Go to Dashboard</a>
             </div>
         </div>
     </main>
