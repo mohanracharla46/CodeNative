@@ -35,13 +35,13 @@
     
     <style>
         :root {
-            --bg-main: #0f172a;
-            --bg-card: #1e293b;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
             --primary: #6366f1;
             --primary-hover: #4f46e5;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
         }
 
         body {
@@ -53,18 +53,18 @@
             min-height: 100vh;
         }
 
-        /* Top Header / Navigation */
+        /* Top Header / Navigation (Homepage Light Style) */
         .video-nav {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
+            background: #ffffff;
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
-            padding: 16px 24px;
+            padding: 14px 28px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
         .video-nav-brand {
@@ -72,39 +72,40 @@
             align-items: center;
             gap: 12px;
             text-decoration: none;
-            color: white;
+            color: #0f172a;
             font-weight: 800;
             font-size: 1.25rem;
         }
 
         .video-nav-brand img {
-            height: 32px;
+            height: 36px;
         }
 
         .video-nav-links {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         }
 
         .video-nav-btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 18px;
+            padding: 10px 20px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.06);
-            color: #cbd5e1;
+            background: #ffffff;
+            color: #475569;
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 600;
             transition: all 0.2s ease;
             border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         }
 
         .video-nav-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: white;
+            background: #f1f5f9;
+            color: #0f172a;
             transform: translateY(-1px);
         }
 
@@ -117,12 +118,12 @@
 
         .video-nav-btn.primary:hover {
             background: linear-gradient(135deg, #4f46e5, #4338ca);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
         }
 
         /* Hero Banner */
         .hero-banner {
-            padding: 50px 24px 30px;
+            padding: 45px 24px 30px;
             text-align: center;
             max-width: 900px;
             margin: 0 auto;
@@ -132,10 +133,10 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 16px;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #f87171;
+            padding: 6px 18px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: #6366f1;
             border-radius: 100px;
             font-size: 0.82rem;
             font-weight: 700;
@@ -145,22 +146,22 @@
         }
 
         .hero-title {
-            font-size: 2.5rem;
+            font-size: 2.4rem;
             font-weight: 800;
-            color: white;
+            color: #0f172a;
             margin: 0 0 16px;
             letter-spacing: -0.02em;
             line-height: 1.25;
         }
 
         .hero-title span {
-            background: linear-gradient(135deg, #818cf8, #c084fc);
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .hero-subtitle {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: var(--text-dim);
             margin: 0 auto 30px;
             max-width: 680px;
@@ -172,7 +173,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             margin-bottom: 40px;
             padding: 0 20px;
@@ -182,20 +183,21 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
-            border-radius: 14px;
-            background: rgba(30, 41, 59, 0.7);
+            padding: 10px 22px;
+            border-radius: 100px;
+            background: #ffffff;
             border: 1px solid var(--border-color);
-            color: #94a3b8;
+            color: #475569;
             font-size: 0.92rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.25s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
         }
 
         .filter-tab:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: white;
+            background: #f1f5f9;
+            color: #0f172a;
             transform: translateY(-2px);
         }
 
@@ -203,16 +205,21 @@
             background: linear-gradient(135deg, #6366f1, #4f46e5);
             color: white;
             border-color: transparent;
-            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
         }
 
         .filter-tab .badge-count {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+            background: #f1f5f9;
+            color: #64748b;
             padding: 2px 8px;
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 700;
+        }
+
+        .filter-tab.active .badge-count {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
         }
 
         /* Main Content Container */
@@ -237,13 +244,14 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
             position: relative;
         }
 
         .video-card:hover {
             transform: translateY(-6px);
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.4);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.12);
         }
 
         /* Video Thumbnail Container */
@@ -251,7 +259,7 @@
             position: relative;
             width: 100%;
             padding-top: 56.25%; /* 16:9 Aspect Ratio */
-            background: #090d16;
+            background: #0f172a;
             overflow: hidden;
             cursor: pointer;
         }
@@ -267,13 +275,13 @@
         }
 
         .video-card:hover .card-thumbnail img {
-            transform: scale(1.06);
+            transform: scale(1.05);
         }
 
         .play-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(15, 23, 42, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -281,13 +289,13 @@
         }
 
         .video-card:hover .play-overlay {
-            background: rgba(15, 23, 42, 0.2);
+            background: rgba(15, 23, 42, 0.15);
         }
 
         .play-btn-circle {
             width: 60px;
             height: 60px;
-            background: rgba(99, 102, 241, 0.9);
+            background: #6366f1;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -302,7 +310,7 @@
         .video-card:hover .play-btn-circle {
             transform: scale(1.15);
             background: #ef4444;
-            box-shadow: 0 12px 30px rgba(239, 68, 68, 0.6);
+            box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5);
         }
 
         .lang-tag {
@@ -311,10 +319,10 @@
             left: 14px;
             padding: 6px 14px;
             border-radius: 8px;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #a5b4fc;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            color: #6366f1;
             font-size: 0.78rem;
             font-weight: 800;
             text-transform: uppercase;
@@ -324,7 +332,7 @@
 
         /* Card Content */
         .card-body {
-            padding: 20px;
+            padding: 22px;
             display: flex;
             flex-direction: column;
             flex: 1;
@@ -333,16 +341,16 @@
         .card-title {
             font-size: 1.15rem;
             font-weight: 700;
-            color: white;
+            color: #0f172a;
             margin: 0 0 10px;
             line-height: 1.4;
         }
 
         .card-desc {
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             color: var(--text-dim);
-            line-height: 1.5;
-            margin: 0 0 20px;
+            line-height: 1.55;
+            margin: 0 0 22px;
             flex: 1;
         }
 
@@ -350,7 +358,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid #f1f5f9;
             padding-top: 16px;
             margin-top: auto;
         }
@@ -359,9 +367,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 18px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
             color: white;
             font-weight: 700;
             font-size: 0.85rem;
@@ -369,51 +377,54 @@
             transition: all 0.2s ease;
             cursor: pointer;
             border: none;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
         }
 
         .watch-btn:hover {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
         }
 
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
-            background: rgba(30, 41, 59, 0.4);
-            border: 2px dashed rgba(255, 255, 255, 0.1);
+            padding: 70px 24px;
+            background: #ffffff;
+            border: 2px dashed #cbd5e1;
             border-radius: 24px;
             max-width: 600px;
             margin: 40px auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
         }
 
         .empty-state i {
             font-size: 3.5rem;
             color: #6366f1;
             margin-bottom: 20px;
-            opacity: 0.8;
+            opacity: 0.85;
         }
 
         .empty-state h3 {
             font-size: 1.4rem;
-            font-weight: 700;
+            font-weight: 800;
             margin: 0 0 10px;
-            color: white;
+            color: #0f172a;
         }
 
         .empty-state p {
             font-size: 0.95rem;
             color: var(--text-dim);
             margin: 0 0 24px;
+            line-height: 1.6;
         }
 
         /* Video Theater Modal */
         .video-modal {
             position: fixed;
             inset: 0;
-            background: rgba(9, 13, 22, 0.92);
-            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
             z-index: 999;
             display: none;
             align-items: center;
@@ -424,11 +435,11 @@
         .video-modal-content {
             width: 100%;
             max-width: 960px;
-            background: #1e293b;
+            background: #ffffff;
             border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--border-color);
             overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
             position: relative;
             animation: modalPop 0.3s ease-out;
         }
@@ -458,13 +469,14 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #0f172a;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .modal-title-text {
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1.2rem;
-            color: white;
+            color: #0f172a;
             margin: 0;
         }
 
@@ -472,8 +484,8 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: #e2e8f0;
+            color: #475569;
             border: none;
             display: flex;
             align-items: center;
@@ -485,6 +497,7 @@
 
         .close-modal-btn:hover {
             background: #ef4444;
+            color: white;
         }
 
         @media (max-width: 640px) {
@@ -496,7 +509,7 @@
 </head>
 <body>
 
-    <!-- Header Navigation -->
+    <!-- Header Navigation (Homepage Style) -->
     <header class="video-nav">
         <a href="/" class="video-nav-brand">
             <img src="/static/images/CodeNative.png" alt="Code Native">
@@ -514,8 +527,8 @@
         <div class="hero-badge">
             <i class="fas fa-play-circle"></i> Telugu Video Tutorials
         </div>
-        <h1 class="hero-title">Learn Coding with <span>Telugu Video Classes</span></h1>
-        <p class="hero-subtitle">Comprehensive, step-by-step video tutorials in Telugu for Python, Java, C, JavaScript, and Web Development with live coding demonstrations.</p>
+        <h1 class="hero-title" id="heroTitle">Learn Coding with <span id="heroSpan">Telugu Video Classes</span></h1>
+        <p class="hero-subtitle" id="heroSubtitle">Comprehensive, step-by-step video tutorials in Telugu for Python, Java, C, JavaScript, and Web Development with live coding demonstrations.</p>
     </section>
 
     <!-- Language Filter Tabs -->
@@ -524,19 +537,19 @@
             <i class="fas fa-layer-group"></i> All Videos <span class="badge-count" id="count-all">0</span>
         </button>
         <button class="filter-tab" data-lang="python" onclick="selectLangTab('python')">
-            <i class="fab fa-python" style="color:#38bdf8;"></i> Python <span class="badge-count" id="count-python">0</span>
+            <i class="fab fa-python" style="color:#0284c7;"></i> Python <span class="badge-count" id="count-python">0</span>
         </button>
         <button class="filter-tab" data-lang="java" onclick="selectLangTab('java')">
-            <i class="fab fa-java" style="color:#f97316;"></i> Java <span class="badge-count" id="count-java">0</span>
+            <i class="fab fa-java" style="color:#ea580c;"></i> Java <span class="badge-count" id="count-java">0</span>
         </button>
         <button class="filter-tab" data-lang="c" onclick="selectLangTab('c')">
-            <i class="fas fa-code" style="color:#a855f7;"></i> C Language <span class="badge-count" id="count-c">0</span>
+            <i class="fas fa-code" style="color:#9333ea;"></i> C Language <span class="badge-count" id="count-c">0</span>
         </button>
         <button class="filter-tab" data-lang="js" onclick="selectLangTab('js')">
-            <i class="fab fa-js-square" style="color:#eab308;"></i> JavaScript <span class="badge-count" id="count-js">0</span>
+            <i class="fab fa-js-square" style="color:#ca8a04;"></i> JavaScript <span class="badge-count" id="count-js">0</span>
         </button>
         <button class="filter-tab" data-lang="web" onclick="selectLangTab('web')">
-            <i class="fab fa-html5" style="color:#ef4444;"></i> Web Dev <span class="badge-count" id="count-web">0</span>
+            <i class="fab fa-html5" style="color:#dc2626;"></i> Web Dev <span class="badge-count" id="count-web">0</span>
         </button>
     </div>
 
@@ -548,9 +561,12 @@
 
         <div id="emptyState" class="empty-state" style="display: none;">
             <i class="fas fa-video-slash"></i>
-            <h3>No Videos Found</h3>
-            <p>No video tutorials have been added for this category yet. We are actively uploading new Telugu video tutorials!</p>
-            <a href="/dashboard" class="video-nav-btn primary">Go to Dashboard</a>
+            <h3 id="emptyTitle">No Videos Found</h3>
+            <p id="emptyDesc">No video tutorials have been uploaded for this category yet. We are actively uploading new Telugu video tutorials!</p>
+            <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+                <button onclick="selectLangTab('all')" class="video-nav-btn primary">View All Videos</button>
+                <a href="/dashboard" class="video-nav-btn">Go to Dashboard</a>
+            </div>
         </div>
     </main>
 
@@ -569,6 +585,16 @@
 
     <script>
         let allVideos = [];
+        let currentLang = 'all';
+
+        const langTitles = {
+            all: { title: "Learn Coding with ", span: "Telugu Video Classes", desc: "Comprehensive, step-by-step video tutorials in Telugu for Python, Java, C, JavaScript, and Web Development." },
+            c: { title: "Master C Language with ", span: "Telugu Video Tutorials", desc: "Step-by-step C programming video lessons in Telugu covering pointers, structures, memory allocation, and algorithms." },
+            python: { title: "Learn Python Programming with ", span: "Telugu Video Tutorials", desc: "Step-by-step Python video lessons in Telugu covering syntax, data structures, OOPs, modules, and practice problems." },
+            java: { title: "Master Java Programming with ", span: "Telugu Video Tutorials", desc: "Complete Java video tutorials in Telugu covering object-oriented concepts, exception handling, and enterprise logic." },
+            js: { title: "Learn JavaScript with ", span: "Telugu Video Tutorials", desc: "Interactive JavaScript video tutorials in Telugu covering ES6, DOM manipulation, async programming, and web logic." },
+            web: { title: "Learn Web Development with ", span: "Telugu Video Tutorials", desc: "Build responsive websites with step-by-step HTML & CSS video tutorials in Telugu." }
+        };
 
         async function fetchVideos() {
             try {
@@ -578,10 +604,10 @@
                     allVideos = data.videos;
                     updateCounts();
                     
-                    // Check URL parameter e.g. /videos.html?lang=python
+                    // Check URL parameter e.g. /videos.html?lang=c
                     const urlParams = new URLSearchParams(window.location.search);
-                    const langParam = urlParams.get('lang') || 'all';
-                    selectLangTab(langParam.toLowerCase());
+                    const langParam = (urlParams.get('lang') || 'all').toLowerCase();
+                    selectLangTab(langParam);
                 } else {
                     renderGrid([]);
                 }
@@ -606,10 +632,18 @@
         }
 
         function selectLangTab(lang) {
+            currentLang = lang;
             document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
             const activeTab = document.querySelector(`.filter-tab[data-lang="${lang}"]`);
             if (activeTab) activeTab.classList.add('active');
 
+            // Update Dynamic Hero Header Text
+            const info = langTitles[lang] || langTitles.all;
+            document.getElementById('heroTitle').childNodes[0].nodeValue = info.title;
+            document.getElementById('heroSpan').innerText = info.span;
+            document.getElementById('heroSubtitle').innerText = info.desc;
+
+            // Filter videos strictly by selected language
             let filtered = allVideos;
             if (lang !== 'all') {
                 filtered = allVideos.filter(v => (v.language || '').toLowerCase() === lang);
@@ -625,6 +659,10 @@
             if (!videos || videos.length === 0) {
                 grid.style.display = 'none';
                 empty.style.display = 'block';
+
+                const langName = currentLang === 'all' ? '' : (currentLang.toUpperCase() + ' ');
+                document.getElementById('emptyTitle').innerText = `No ${langName}Videos Found`;
+                document.getElementById('emptyDesc').innerText = `No ${langName}video tutorials have been uploaded yet. We are actively uploading new Telugu video tutorials!`;
                 return;
             }
 
@@ -655,7 +693,7 @@
                             <button class="watch-btn" onclick="openVideoModal('${v.title.replace(/'/g, "\\'")}', '${embedUrl}')">
                                 <i class="fas fa-play-circle"></i> Watch Video
                             </button>
-                            <a href="${v.youtube_url}" target="_blank" style="color:var(--text-dim); font-size:0.8rem; text-decoration:none;" title="Open in YouTube">
+                            <a href="${v.youtube_url}" target="_blank" style="color:var(--text-dim); font-size:0.82rem; text-decoration:none; font-weight:600;" title="Open in YouTube">
                                 <i class="fab fa-youtube" style="color:#ef4444;"></i> YouTube
                             </a>
                         </div>
@@ -667,7 +705,6 @@
 
         function openVideoModal(title, embedUrl) {
             document.getElementById('modalVideoTitle').innerText = title;
-            // Add autoplay to embedUrl
             const autoEmbed = embedUrl.includes('?') ? `${embedUrl}&autoplay=1` : `${embedUrl}?autoplay=1`;
             document.getElementById('modalIframe').src = autoEmbed;
             const modal = document.getElementById('videoModal');
@@ -680,7 +717,6 @@
             document.getElementById('modalIframe').src = '';
         }
 
-        // Close modal on click outside
         window.onclick = function(e) {
             const modal = document.getElementById('videoModal');
             if (e.target === modal) {
