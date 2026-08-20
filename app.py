@@ -645,12 +645,36 @@ def init_db():
         )
     '''
 
+    videos_sql = '''
+        CREATE TABLE IF NOT EXISTS videos (
+            id SERIAL PRIMARY KEY,
+            language TEXT NOT NULL,
+            title TEXT NOT NULL,
+            youtube_url TEXT NOT NULL,
+            description TEXT,
+            topic_slug TEXT,
+            order_index INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS videos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            language TEXT NOT NULL,
+            title TEXT NOT NULL,
+            youtube_url TEXT NOT NULL,
+            description TEXT,
+            topic_slug TEXT,
+            order_index INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
                     online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql,
-                    task_submissions_sql, doubts_sql, user_notifications_sql]:
+                    task_submissions_sql, doubts_sql, user_notifications_sql, videos_sql]:
             cursor.execute(sql)
 
         for idx_sql in [
@@ -658,6 +682,7 @@ def init_db():
             "CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)",
             "CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)",
             "CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)",
+            "CREATE INDEX IF NOT EXISTS idx_videos_language ON videos(language)",
         ]:
             cursor.execute(idx_sql)
 
@@ -684,13 +709,14 @@ def init_db():
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
                     feedback_sql, careers_sql, career_applications_sql, referrals_sql,
                     online_classes_sql, online_class_registrations_sql, tasks_sql, user_tasks_sql,
-                    task_submissions_sql, doubts_sql, user_notifications_sql]:
+                    task_submissions_sql, doubts_sql, user_notifications_sql, videos_sql]:
             conn.execute(sql)
         for idx_sql in [
             "CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)",
             "CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)",
             "CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)",
             "CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)",
+            "CREATE INDEX IF NOT EXISTS idx_videos_language ON videos(language)",
         ]:
             conn.execute(idx_sql)
 
@@ -2484,6 +2510,39 @@ async def export_users(request: Request):
     return response
 
 
+def ensure_videos_table(conn):
+    """Ensure videos table exists in DB (creates automatically if missing)."""
+    try:
+        is_pg = hasattr(conn, 'cursor_factory')
+        create_sql = '''
+            CREATE TABLE IF NOT EXISTS videos (
+                id SERIAL PRIMARY KEY,
+                language TEXT NOT NULL,
+                title TEXT NOT NULL,
+                youtube_url TEXT NOT NULL,
+                description TEXT,
+                topic_slug TEXT,
+                order_index INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''' if is_pg else '''
+            CREATE TABLE IF NOT EXISTS videos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                language TEXT NOT NULL,
+                title TEXT NOT NULL,
+                youtube_url TEXT NOT NULL,
+                description TEXT,
+                topic_slug TEXT,
+                order_index INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        '''
+        execute_query(conn, create_sql)
+        conn.commit()
+    except Exception as e:
+        print(f"Error ensuring videos table: {e}")
+
+
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
     if not _admin_check(request): return _redirect("/")
@@ -2583,7 +2642,7 @@ async def admin_dashboard(request: Request):
         # Fetch approved user tasks
         approved_tasks = execute_query(conn2, "SELECT user_id, task_id FROM user_tasks").fetchall()
         approved_set = {(row['user_id'], row['task_id']) for row in approved_tasks}
-        
+
         # Fetch doubts list
         doubts_list = execute_query(conn2, """
             SELECT d.*, u.name as user_name, u.email as user_email 
@@ -2592,7 +2651,26 @@ async def admin_dashboard(request: Request):
             ORDER BY d.created_at DESC
         """).fetchall()
         
+        pending_doubts_count_res = execute_query(conn2, "SELECT COUNT(*) as count FROM doubts WHERE status = 'Pending'").fetchone()
+        pending_doubts_count = pending_doubts_count_res['count'] if pending_doubts_count_res else 0
+        
+        processed_subs = []
+        for s in submissions_list:
+            sd = dict(s)
+            sd['approved'] = (s['user_id'], s['task_id']) in approved_set
+            
+            sd['score_display'] = '—'
+            if s['task_type'] == 'exam' and s['submission_data']:
+                try:
+                    import json
+                    parsed = json.loads(s['submission_data'])
+                    sd['score_display'] = f"{parsed.get('score', 0)} / {parsed.get('total', 0)}"
+                except Exception:
+                    pass
+            processed_subs.append(sd)
+
         # Fetch videos list
+        ensure_videos_table(conn2)
         videos_list = execute_query(conn2, "SELECT * FROM videos ORDER BY language ASC, order_index ASC, id DESC").fetchall()
         processed_videos = []
         for v in videos_list:
@@ -2630,6 +2708,7 @@ async def get_videos(request: Request, lang: Optional[str] = None):
     """Public endpoint to fetch all videos or videos filtered by language."""
     conn = get_db_connection()
     try:
+        ensure_videos_table(conn)
         if lang:
             rows = execute_query(conn, "SELECT * FROM videos WHERE LOWER(language) = LOWER(?) ORDER BY order_index ASC, id DESC", (lang,)).fetchall()
         else:
@@ -2674,6 +2753,7 @@ async def admin_add_video(request: Request):
 
         embed_url = format_youtube_embed(raw_url)
         conn = get_db_connection()
+        ensure_videos_table(conn)
         is_pg = hasattr(conn, 'cursor_factory')
 
         if is_pg:
