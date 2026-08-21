@@ -2029,7 +2029,7 @@ async def index(request: Request):
         {"name": "Deva",            "rating": 5, "message": "Good Web for beginners, such good idea it is. Content is in Telugu, and the AI is next level asalu! Good Initiative.",                                "role": "Independent Scholar",             "date": "2026-05-04", "initial": "D"},
         {"name": "Srikar Manchala", "rating": 5, "message": "Very useful platform for native speakers. Everything is explained clearly in Telugu. 🚀",                                                             "role": "Bharath Institute of Higher Ed",   "date": "2026-05-04", "initial": "S"},
         {"name": "PapaRao Rapuri",  "rating": 5, "message": "CodeNative is very helpful for beginners. The step-by-step approach makes learning programming easy to follow. Highly recommended!",                  "role": "Independent Scholar",             "date": "2026-05-01", "initial": "P"},
-        {"name": "Tutorial User",   "rating": 5, "message": "Oh chala useful and simply understanding. Best platform for Telugu students. 😊",                                                                     "role": "Independent Scholar",             "date": "2026-04-25", "initial": "T"},
+        {"name": "Karthik R",       "rating": 5, "message": "Oh chala useful and simply understanding. Best platform for Telugu students. 😊",                                                                     "role": "Independent Scholar",             "date": "2026-04-25", "initial": "K"},
         {"name": "Venkatesh",       "rating": 5, "message": "All good, UI is good. The platform is consistent and easy to navigate. Keep it up!",                                                                  "role": "MLRIT",                           "date": "2026-05-04", "initial": "V"},
         {"name": "Vaishu",          "rating": 5, "message": "Excellent Platform. Friendly Content and very easy to understand for beginners. 🌟",                                                                  "role": "Independent Scholar",             "date": "2026-05-04", "initial": "V"},
         {"name": "Ajay Patel Boppa","rating": 5, "message": "Such a good website to prepare for courses in Telugu easily. Concepts are explained very well.",                                                      "role": "Jyothismathi Institute of Tech",   "date": "2026-05-04", "initial": "A"},
@@ -2166,6 +2166,12 @@ async def get_sitemap_xml():
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url>
+    <loc>https://codenative.co.in/about</loc>
+    <lastmod>2026-08-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>"""
     return Response(content=xml_content, media_type="application/xml")
 
@@ -2208,6 +2214,12 @@ async def privacy_policy(request: Request):   return _render(request, "privacy-p
 
 @app.get("/cookie-policy.html",    response_class=HTMLResponse)
 async def cookie_policy(request: Request):    return _render(request, "cookie-policy.html")
+
+@app.get("/about", response_class=HTMLResponse)
+@app.get("/about.html", response_class=HTMLResponse)
+@app.get("/contact", response_class=HTMLResponse)
+@app.get("/contact.html", response_class=HTMLResponse)
+async def about_page(request: Request):       return _render(request, "about.html")
 
 @app.get("/web.html", response_class=HTMLResponse)
 async def web_page(request: Request):

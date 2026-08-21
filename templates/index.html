@@ -1432,28 +1432,6 @@
                         </div>
                     </div>
                     {% endfor %}
-                    <!-- Duplicate reviews for seamless looping -->
-                    {% for review in reviews %}
-                    <div class="review-card">
-                        <div class="review-header">
-                            <div class="user-info">
-                                <div class="user-avatar">{{ review.initial }}</div>
-                                <div class="user-meta">
-                                    <div class="user-name">{{ review.name }}</div>
-                                    <div class="user-role">{{ review.role }}</div>
-                                </div>
-                            </div>
-                            <div class="rating">
-                                <i class="fas fa-star"></i>
-                                <span>{{ review.rating }}</span>
-                            </div>
-                        </div>
-                        <p class="review-text">"{{ review.message }}"</p>
-                        <div class="review-footer">
-                            <span class="review-date">{{ review.date }}</span>
-                        </div>
-                    </div>
-                    {% endfor %}
                 </div>
             </div>
         </section>
@@ -1588,6 +1566,7 @@
                         <li><a href="/java.html">Java</a></li>
                         <li><a href="/python.html">Python</a></li>
                         <li><a href="/roadmap.html">Roadmap</a></li>
+                        <li><a href="/about">About Us & Contact</a></li>
                         <li><a href="/feedback.html">Give Feedback</a></li>
                     </ul>
                 </div>
@@ -1605,7 +1584,6 @@
                         <a href="https://whatsapp.com/channel/0029Vb7lp702P59gBIjIhx0O" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" style="color: #25D366;"><i class="fab fa-whatsapp"></i></a>
                         <a href="https://www.linkedin.com/company/codenative-edu" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
                         <a href="https://www.instagram.com/codenative8" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
             </div>

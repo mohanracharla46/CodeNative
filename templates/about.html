@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us & Contact | Code Native - Learn Coding in Telugu</title>
+    <meta name="title" content="About Us & Contact | Code Native - Learn Coding in Telugu">
+    <meta name="description" content="Code Native is India's First Telugu Coding Learning Platform. Empowering students with localized coding education, AI powered doubt solving, and structured roadmaps.">
+    <meta name="keywords" content="Code Native about us, Telugu coding platform, contact Code Native, learn coding in Telugu">
+    <meta name="author" content="Code Native">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://codenative.co.in/about">
+    <meta property="og:title" content="About Us & Contact | Code Native">
+    <meta property="og:description" content="India's First Telugu Coding Platform — Learn C, Java, Python, HTML & JavaScript in Telugu.">
+    <meta property="og:image" content="/static/images/LMS image.jpg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://codenative.co.in/about">
+    <meta name="twitter:title" content="About Us & Contact | Code Native">
+    <meta name="twitter:description" content="Learn coding in Telugu with AI powered doubt solving. 100% Free forever!">
+    <meta name="twitter:image" content="/static/images/LMS image.jpg">
+
+    {% include 'analytics.html' %}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+
+    <style>
+        .legal-container {
+            max-width: 850px;
+            margin: 50px auto;
+            padding: 40px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .legal-container h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .legal-container p,
+        .legal-container li {
+            color: var(--text-dim);
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .legal-container h2 {
+            font-size: 24px;
+            color: var(--text-light);
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .contact-card {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .contact-card p {
+            margin-bottom: 10px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .contact-card a {
+            color: #818cf8;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .contact-card a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo"><a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a></div>
+            <div class="header-actions">
+                {% if session.get('is_admin') %}
+                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
+                {% endif %}
+                
+                {% if session.get('user_name') %}
+                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle" style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
+                {% else %}
+                <a href="/signin.html" class="btn-signup">Sign in</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="legal-container">
+        <h1>About Code Native</h1>
+        <p>Welcome to <strong>Code Native</strong> (<code>codenative.co.in</code>), India's premier native language programming platform designed specifically for Telugu-speaking students and tech enthusiasts.</p>
+
+        <h2>Our Mission</h2>
+        <p>Programming should not have language barriers. Millions of aspiring developers across India face difficulties understanding complex computer science concepts when presented exclusively in English. At Code Native, our mission is to make quality tech education accessible, simple, and engaging by teaching programming languages like C, Java, Python, HTML, CSS, and JavaScript in <strong>Telugu</strong>.</p>
+
+        <h2>Who Runs Code Native</h2>
+        <p>Code Native is developed and operated by a passionate group of technology educators, software engineers, and community mentors dedicated to bridging the digital skill gap. By combining structured step-by-step curricula with interactive online compilers and AI-assisted doubt solving, we empower students from native backgrounds to build real-world software skills and excel in tech careers.</p>
+
+        <h2>Contact Us</h2>
+        <p>We are always eager to hear from our students, educators, and community members. Whether you have questions, feedback, partnership inquiries, or need support with your learning account, feel free to reach out to us.</p>
+
+        <div class="contact-card">
+            <p><i class="fas fa-envelope" style="margin-right: 10px; color: #818cf8;"></i><strong>Support Email:</strong> <a href="mailto:support@codenative.co.in">support@codenative.co.in</a></p>
+            <p><i class="fas fa-globe" style="margin-right: 10px; color: #818cf8;"></i><strong>Website:</strong> <a href="https://codenative.co.in">https://codenative.co.in</a></p>
+            <p><i class="fas fa-headset" style="margin-right: 10px; color: #818cf8;"></i><strong>Response Time:</strong> We typically respond to all emails within 24 to 48 business hours.</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"
+                        style="height: 48px; margin-bottom: 15px;" width="70" height="48" loading="lazy" decoding="async">
+                    <p>Empowering the next generation of developers with localized learning.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Explore</h3>
+                    <ul>
+                        <li><a href="/c.html">C Programming</a></li>
+                        <li><a href="/java.html">Java</a></li>
+                        <li><a href="/python.html">Python</a></li>
+                        <li><a href="/roadmap.html">Roadmap</a></li>
+                        <li><a href="/about">About Us & Contact</a></li>
+                        <li><a href="/feedback.html">Give Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="/terms-conditions.html">Terms & Conditions</a></li>
+                        <li><a href="/cookie-policy.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <div class="social-icons">
+                        <a href="https://whatsapp.com/channel/0029Vb7lp702P59gBIjIhx0O" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" style="color: #25D366;"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.linkedin.com/company/codenative-edu" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.instagram.com/codenative8" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Code Native. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
