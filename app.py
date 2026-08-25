@@ -972,6 +972,18 @@ async def llms_txt(request: Request):
     return Response(content=content, media_type="text/plain")
 
 
+@app.get('/ads.txt')
+async def ads_txt(request: Request):
+    path = os.path.join("static", "ads.txt")
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            content = f.read()
+    else:
+        content = "google.com, pub-1268674050644687, DIRECT, f08c47fec0942fa0\n"
+    return Response(content=content, media_type="text/plain")
+
+
+
 @app.get('/sitemap.xml')
 async def sitemap(request: Request):
     base_url = "https://codenative.co.in"
