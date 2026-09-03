@@ -8,7 +8,24 @@
   gtag('config', '{{ ga_id }}');
 </script>
 
-<!-- Google AdSense Account Verification & Ads Script -->
+<!-- Google AdSense Account Verification & Ads Script (Deferred to prevent TBT blocking) -->
 <meta name="google-adsense-account" content="ca-pub-1268674050644687">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1268674050644687" crossorigin="anonymous"></script>
+<script>
+  (function() {
+    function loadAdSense() {
+      var script = document.createElement('script');
+      script.async = true;
+      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1268674050644687";
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    }
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(loadAdSense, { timeout: 3000 });
+    } else if (document.readyState === 'complete') {
+      loadAdSense();
+    } else {
+      window.addEventListener('load', loadAdSense, { passive: true });
+    }
+  })();
+</script>
 
